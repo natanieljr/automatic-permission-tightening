@@ -1,0 +1,15 @@
+### IntelliJ IDEA ###
+**/*.iws
+**/*.eml
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/misc.xml
+**/.idea/libraries
+out/
+
+### Working directories ###
+output_device1
+output
+tmp
+temp_extracted_resources
+data/apk/*
