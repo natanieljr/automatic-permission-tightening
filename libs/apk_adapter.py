@@ -26,3 +26,15 @@ class APKAdapter(APK):
             return self.filename
 
         return "package=%s, version=%s" % (self.package, self.get_androidversion_name())
+
+    def get_basename(self):
+        return os.path.basename(self.filename)
+
+    def get_dirname(self):
+        return os.path.dirname(self.filename)
+
+    def get_directory_name(self):
+        if self.package == "":
+            return self.filename.replace('.apk', '')
+
+        return '%s_v%s' % (self.package, self.get_androidversion_name().replace('.', '_'))

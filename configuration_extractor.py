@@ -63,7 +63,7 @@ class XPrivacyConfigurationExtractor(object):
         logger.debug("Configuration files will be stored in %s", self.output_directory)
         for apk in apks:
             logger.info("Extracting configuration for APK %s", apk)
-            file_name = os.path.basename(apk.filename)
+            file_name = apk.get_basename().replace('.apk', '')
 
             # Install APK into device
             self.__install_apk(apk)
