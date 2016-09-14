@@ -155,7 +155,7 @@ class Main(object):
             summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, executor_output_dir)
 
             # Print debug messages
-            logger.debug('Summarized API list', apk)
+            logger.debug('Summarized API list')
             summarized_api_name, summarized_api_count = summarized_api_list
             for method_signature, count in zip(summarized_api_name, summarized_api_count):
                 logger.debug('--%s\t%d', method_signature, count)
