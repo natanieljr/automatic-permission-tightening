@@ -8,8 +8,10 @@
 out/
 
 ### Working directories ###
-output_device1/*
-output
-tmp
-temp_extracted_resources/*
+/output_device1
+/output
+/tmp
+/temp_extracted_resources
 data/apk/*
+/libs/apk_parse/output_device1/
+/libs/apk_parse/temp_extracted_resources/
