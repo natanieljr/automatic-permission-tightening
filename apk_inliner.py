@@ -107,7 +107,4 @@ class ApkInliner(object):
             else:
                 logger.warn("Unable to identify inlined version of apk %s", apk)
 
-        for k in mapping.keys():
-            print(k, mapping[k])
-
         return mapping

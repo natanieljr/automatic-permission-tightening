@@ -33,7 +33,7 @@ class APKAdapter(APK):
     def get_dirname(self):
         return os.path.dirname(self.filename)
 
-    def get_directory_name(self):
+    def get_apk_name_as_directory_name(self):
         if self.package == "":
             return self.filename.replace('.apk', '')
 

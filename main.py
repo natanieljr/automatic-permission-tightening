@@ -8,6 +8,7 @@ from consts import *
 from libs.apk_adapter import APKAdapter
 from configuration_extractor import XPrivacyConfigurationExtractor
 from apk_inliner import ApkInliner
+from droidmate_executor import DroidmateExecutor
 
 logger = logging.getLogger()
 
@@ -101,11 +102,18 @@ class Main(object):
         #self.configurator_extractor.output_directory = os.path.join(args.tmpDir, EXTRACTED_CFG_FOLDER)
         #self.configurator_extractor.process(self.apks)
 
+        inlined_apk_dir = self.get_inlined_apk_dir()
+
         # Inline APKs
         apk_inliner = ApkInliner()
-        apk_inliner.output_directory = self.get_inlined_apk_dir()
+        apk_inliner.output_directory = inlined_apk_dir
         apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk_inliner"))
-        apk_inliner.process(self.apks)
+        apk_mapping = apk_inliner.process(self.apks)
+
+        executor_tmp_dir = os.path.join(self.args.tmpDir, 'processing')
+        executor_output_dir = os.path.join(self.args.tmpDir, 'first-run')
+        droidmate_executor = DroidmateExecutor(inlined_apk_dir, executor_output_dir, executor_tmp_dir)
+        droidmate_executor.first_exploration(self.apks, apk_mapping)
 
         for apk in self.apks:
             logger.debug("Processing APK %s", apk)
