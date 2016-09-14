@@ -1,7 +1,6 @@
 import logging
-import shutil
+import operator
 import os
-from shutil import copyfile, move
 
 logger = logging.getLogger()
 
@@ -81,7 +80,7 @@ class SummaryProcessor(object):
     @staticmethod
     def __write_api_list(api_list, result_directory):
         """
-        Write a file containing the API list for the application
+        Write a file containing the list of APIs for the application
         :param api_list: List of identified APIs, idx0 = class name, idx1 = method signature
         :param result_directory: Directory to save the API list
         """
@@ -91,12 +90,30 @@ class SummaryProcessor(object):
         f = open(path, 'w')
 
         f.write('%s\t%s\n' % ('class_name', 'method_signature'))
-        for class_name, method_signature, in api_list:
+        for class_name, method_signature in api_list:
             f.write('%s\t%s\n' % (class_name, method_signature))
 
         f.close()
 
-    def process(self, apks, results_directory):
+    @staticmethod
+    def __write_summarized_api_list(api_list, api_count, result_directory):
+        """
+        Write a file containing the list of APIs invoked by the application and the number of times it was called
+        :param api_list: List of identified APIs, idx0 = class name, idx1 = method signature
+        :param result_directory: Directory to save the API list
+        """
+
+        path = os.path.join(result_directory, 'summarized_api_list.txt')
+        logger.debug('Writting summarized API list file %s', path)
+        f = open(path, 'w')
+
+        f.write('%s\t%s\n' % ('method_signature', 'count'))
+        for method_signature, count in zip(api_list, api_count):
+            f.write('%s\t%d\n' % (method_signature, count))
+
+        f.close()
+
+    def extract_apis(self, apks, results_directory):
         """
         Check in the results directory for all APKs that were explored and extract the list of APIs from each of the
         applications
@@ -121,3 +138,56 @@ class SummaryProcessor(object):
                 logger.warn('No results found for APK %s', apk)
 
         return processed_summaries
+
+    def count_api_calls_per_apk(self, processed_summaries, results_directory):
+        """
+        Count the number of times each API was called in each apk
+        :param processed_summaries: List of API calls per APK
+        :return: Summarized list of API calls per APK
+        """
+        result = []
+
+        for apk, log in processed_summaries:
+            logger.debug('Counting APIs for %s', apk)
+
+            api_list = []
+            api_count = []
+
+            for class_name, method_signature in log:
+                key = '%s->%s' % (class_name, method_signature)
+                if key not in api_list:
+                    api_list.append(key)
+                    api_count.append(1)
+                else:
+                    idx = api_list.index(key)
+                    api_count[idx] += 1
+
+            path = os.path.join(results_directory, apk.get_apk_name_as_directory_name())
+            self.__write_summarized_api_list(api_list, api_count, path)
+
+            result.append([apk, api_list, api_count])
+
+        return result
+
+    def count_api_calls(self, summarized_apis, results_directory):
+        """
+        Count the number of times each API was called in each apk
+        :param processed_summaries: List of API calls per APK
+        :return: Summarized list of API calls per APK
+        """
+        api_list = []
+        api_count = []
+
+        logger.debug('Counting APIs')
+        for apk, apk_api_list, apk_api_count in summarized_apis:
+
+            for key, count in zip(apk_api_list, apk_api_count):
+                if key not in api_list:
+                    api_list.append(key)
+                    api_count.append(count)
+                else:
+                    idx = api_list.index(key)
+                    api_count[idx] += count
+
+        self.__write_summarized_api_list(api_list, api_count, results_directory)
+        return [api_list, api_count]
