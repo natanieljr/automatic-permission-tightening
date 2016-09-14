@@ -1,14 +1,24 @@
-# Command line parameters
+# Command line parameters (configuration)
 ARG_APK = '--apk'
 ARG_APK_SHORT = '-a'
 ARG_DIR = '--directory'
 ARG_DIR_SHORT = '-d'
-ARG_CFG = '--extractConfig'
-ARG_CFG_SHORT = '-e'
 ARG_OUT = '--output'
 ARG_OUT_SHORT = '-o'
 ARG_TMP = '--tmpDir'
 ARG_TMP_SHORT = '-t'
+
+# Command line parameters (actions)
+ARG_KEEP_DIR = '--keepDirectories'
+ARG_KEEP_DIR_NO = '--no-keepDirectories'
+ARG_CFG = '--extractConfig'
+ARG_CFG_NO = '--no-extractConfig'
+ARG_INLINE = '--inline'
+ARG_INLINE_NO = '--no-inline'
+ARG_EXPLORE = '--explore'
+ARG_EXPLORE_NO = '--no-explore'
+ARG_EXTRACT_APIS = '--extractAPIs'
+ARG_EXTRACT_APIS_NO = '--no-extractAPIs'
 
 EXTRACTED_CFG_FOLDER = 'extractedConfiguration'
 
