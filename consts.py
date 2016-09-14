@@ -27,6 +27,10 @@ ADB_INSTALL_COMMAND = 'adb install %s'
 ADB_EXPORT_COMMAND = 'adb shell am start -a biz.bokhorst.xprivacy.action.EXPORT -e FileName /storage/emulated/0/.xprivacy/%s.xml'
 ADB_PULL_COMMAND = 'adb pull /storage/emulated/0/.xprivacy/%s.xml %s%s.xml'
 ADB_UNINSTALL_COMMAND = 'adb uninstall %s'
+ADB_REBOOT_COMMAND = 'adb reboot'
+ADB_UNLOCK_SCREEN_COMMAND = 'adb shell input keyevent 82'
+# Returns Parcel(00000000 00000000) if locked and Parcel(00000000 00000001) if unlocked
+ADB_CHECK_LOCKED_SCREEN_COMMAND = 'adb shell service call power 12'
 
 # Droidmate commands
 JDK_LOCATION = "C:\\Program Files\\Java\\jdk1.8.0_45"

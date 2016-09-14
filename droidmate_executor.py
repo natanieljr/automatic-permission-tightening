@@ -1,22 +1,27 @@
 import logging
+import time
 import shutil
 import os
 import subprocess
 from shutil import copyfile, move
 
-from consts import DROIDMATE_FIRST_RUN
+from consts import DROIDMATE_FIRST_RUN, ADB_UNLOCK_SCREEN_COMMAND, ADB_REBOOT_COMMAND
 
 logger = logging.getLogger()
 
 
 class DroidmateExecutor(object):
+    reboot_wait_interval = 60
+
     output_directory = None
     inlined_apk_directory = None
     tmp_directory = None
+    error_directory = None
 
     def __init__(self, inlined_apk_directory, output_directory, tmp_directory):
         self.output_directory = output_directory
         self.inlined_apk_directory = inlined_apk_directory
+        self.error_directory = os.path.join(inlined_apk_directory, 'fail')
         self.tmp_directory = tmp_directory
 
     def __copy_apk_to_tmp(self, inlined_apk_name):
@@ -50,6 +55,27 @@ class DroidmateExecutor(object):
         move(src, dst)
         assert os.path.exists(result_directory)
 
+    def __copy_results_to_fail(self, apk):
+        """
+        Copy exploration results to output directory
+        :param apk: Explored APK
+        """
+        logger.debug('Copying %s to results directory (%s)', apk, self.tmp_directory)
+        if os.path.exists(self.error_directory):
+            shutil.rmtree(self.error_directory)
+        os.mkdir(self.error_directory)
+        assert os.path.exists(self.error_directory)
+
+        fail_directory = os.path.join(self.error_directory, apk.get_apk_name_as_directory_name())
+
+        if os.path.exists(fail_directory):
+            shutil.rmtree(fail_directory)
+
+        src = 'output_device1'
+        dst = fail_directory
+        move(src, dst)
+        assert os.path.exists(fail_directory)
+
     def __clear_execution_directories(self):
         if os.path.exists('output_device1'):
             shutil.rmtree('output_device1')
@@ -62,11 +88,19 @@ class DroidmateExecutor(object):
         Execute DroidMate's exploration on target APK folder
         :param directory: Directory containing the original APKs
         """
+        logging.debug("Restarting device, ADB command: %s", ADB_REBOOT_COMMAND)
+        os.system(ADB_REBOOT_COMMAND)
+        logging.debug("Waiting %d seconds for device to reboot", self.reboot_wait_interval)
+        time.sleep(self.reboot_wait_interval)
+        logging.debug("Unlocking device screen, ADB command: %s", ADB_UNLOCK_SCREEN_COMMAND)
+        os.system(ADB_UNLOCK_SCREEN_COMMAND)
+
         command = droidmate_command[:]
         command[-1] = command[-1] % self.tmp_directory
         logging.debug("Executing DroidMate command: %s", command)
         signal = subprocess.call([command], shell=True)
-        assert signal == 0
+        #assert signal == 0
+        return signal
 
     def first_exploration(self, apks, apk_mapping):
         """
@@ -99,7 +133,13 @@ class DroidmateExecutor(object):
 
                 # Run Droidmate's first explorarion
                 logger.debug(DROIDMATE_FIRST_RUN)
-                self.__run_droidmate(DROIDMATE_FIRST_RUN)
+                result = self.__run_droidmate(DROIDMATE_FIRST_RUN)
 
-                # Copy exploration results to output directory
-                self.__copy_results_to_output(apk)
+                # If exploration was successful
+                if result == 0:
+                    # Copy exploration results to output directory
+                    self.__copy_results_to_output(apk)
+                else:
+                    logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
+                                apk, result, self.error_directory)
+                    self.__copy_results_to_fail(apk)

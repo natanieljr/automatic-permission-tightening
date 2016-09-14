@@ -136,12 +136,29 @@ class Main(object):
         # Extract APIs
         if self.args.extractAPIs:
             summary_processor = SummaryProcessor()
-            processed_summaries = summary_processor.process(self.apks, executor_output_dir)
+            processed_summaries = summary_processor.extract_apis(self.apks, executor_output_dir)
 
+            # Print debug messages
             for apk, log in processed_summaries:
-                logger.debug('Listing APIs for %s', apk),
+                logger.debug('Listing APIs for %s', apk)
                 for class_name, method_signature in log:
-                    logger.debug('--%s->%s', class_name, method_signature),
+                    logger.debug('--%s->%s', class_name, method_signature)
+
+            summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, executor_output_dir)
+
+            # Print debug messages
+            for apk, api_list, api_count in summarized_api_list_apk:
+                logger.debug('Summarized API list for %s', apk)
+                for method_signature, count in zip(api_list, api_count):
+                    logger.debug('--%s\t%d', method_signature, count)
+
+            summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, executor_output_dir)
+
+            # Print debug messages
+            logger.debug('Summarized API list', apk)
+            summarized_api_name, summarized_api_count = summarized_api_list
+            for method_signature, count in zip(summarized_api_name, summarized_api_count):
+                logger.debug('--%s\t%d', method_signature, count)
         else:
             logger.debug("Skipping 'Extract APIs'")
 
