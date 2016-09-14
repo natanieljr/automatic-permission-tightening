@@ -31,6 +31,20 @@ class Main(object):
         self.__validate()
         self.__initialize()
 
+    def get_inlined_apk_dir(self):
+        """
+        Return the directory where inlined APKs should be stored. This directory is a subdirectory of the temporary
+        directory
+        :return: Inlined APKs directory
+        """
+        return os.path.join(self.args.tmpDir, "inlined")
+
+    def get_original_apk_dir(self):
+        if args.apk is not None:
+            return os.path.dirname(args.apk)
+
+        return args.directory
+
     @staticmethod
     def __recreate_directory(directory):
         """
@@ -89,7 +103,7 @@ class Main(object):
 
         # Inline APKs
         apk_inliner = ApkInliner()
-        apk_inliner.output_directory = os.path.join(self.args.tmpDir, "inlined")
+        apk_inliner.output_directory = self.get_inlined_apk_dir()
         apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk_inliner"))
         apk_inliner.process(self.apks)
 
