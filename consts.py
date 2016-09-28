@@ -34,6 +34,11 @@ ADB_UNLOCK_SCREEN_COMMAND = 'adb shell input keyevent 82'
 # Returns Parcel(00000000 00000000) if locked and Parcel(00000000 00000001) if unlocked
 ADB_CHECK_LOCKED_SCREEN_COMMAND = 'adb shell service call power 12'
 
+# XPrivacy enabler/disabler
+XPRIVACY_ENABLER_BASE = 'resources\\xprivacy_enabler_base.apk'
+XPRIVACY_ENABLER_TEST = 'resources\\xprivacy_enabler_base.apk'
+XPRIVACY_ENABLER_RUN = 'adb shell am instrument -w -r -e enable %s -e debug true -e class org.droidmate.mockable.xprivacy.XPrivacyEnabler#init org.droidmate.mockable.xprivacy.xprivacyenabler.test/android.support.test.runner.AndroidJUnitRunner'
+
 # Droidmate commands
 JDK_LOCATION = "C:\\Program Files\\Java\\jdk1.8.0_45"
 DROIDMATE_LOCATION = "C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\droidmate"

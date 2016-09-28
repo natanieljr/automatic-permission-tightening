@@ -5,7 +5,8 @@ import os
 import subprocess
 from shutil import copyfile, move
 
-from consts import DROIDMATE_FIRST_RUN, DROIDMATE_RUN_WITH_XPRIVACY, ADB_UNLOCK_SCREEN_COMMAND, ADB_REBOOT_COMMAND
+from libs.apk_adapter import APKAdapter
+from consts import *
 
 logger = logging.getLogger()
 
@@ -122,6 +123,46 @@ class DroidmateExecutor(object):
             os.mkdir(self.output_directory)
         assert os.path.exists(self.output_directory)
 
+    def __enable_disable_xprivacy(self, enable):
+        if enable:
+            logger.info('Activating XPrivacy')
+        else:
+            logger.info('Deactivating XPrivacy')
+
+        command = ADB_INSTALL_COMMAND % XPRIVACY_ENABLER_BASE
+        logging.debug("Installing Enabler Base, ADB command: %s", command)
+        os.system(command)
+        command = ADB_INSTALL_COMMAND % XPRIVACY_ENABLER_TEST
+        logging.debug("Installing Enabler Test, ADB command: %s", command)
+        os.system(command)
+
+        if enable:
+            command = XPRIVACY_ENABLER_RUN % 'true'
+            logging.debug("Enabling XPrivacy, ADB command: %s", command)
+        else:
+            command = XPRIVACY_ENABLER_RUN % 'false'
+            logging.debug("Disabling XPrivacy, ADB command: %s", command)
+
+        os.system(command)
+
+        enabler_base = APKAdapter(XPRIVACY_ENABLER_BASE)
+        enabler_test = APKAdapter(XPRIVACY_ENABLER_TEST)
+
+        command = ADB_UNINSTALL_COMMAND % enabler_test.package
+        logging.debug("Uninstalling Enabler Test, ADB command: %s", command)
+        os.system(command)
+
+        command = ADB_UNINSTALL_COMMAND % enabler_base.package
+        logging.debug("Uninstalling Enabler Base, ADB command: %s", command)
+        os.system(command)
+
+        logging.debug("Restarting device, ADB command: %s", ADB_REBOOT_COMMAND)
+        os.system(ADB_REBOOT_COMMAND)
+        logging.debug("Waiting %d seconds for device to reboot", self.reboot_wait_interval)
+        time.sleep(self.reboot_wait_interval)
+        logging.debug("Unlocking device screen, ADB command: %s", ADB_UNLOCK_SCREEN_COMMAND)
+        os.system(ADB_UNLOCK_SCREEN_COMMAND)
+
     def first_exploration(self, apks, apk_mapping):
         """
         Perform the first APK exploration using Droidmate. Each APK is copied and executed alone. It's results and
@@ -130,6 +171,7 @@ class DroidmateExecutor(object):
         :param apk_mapping: List of mapped original/inlined APKs
         """
         self.__initialize()
+        self.__enable_disable_xprivacy(False)
 
         # Foreach APK
         for apk in apks:
@@ -165,6 +207,7 @@ class DroidmateExecutor(object):
         :param apk_mapping: List of mapped original/inlined APKs
         """
         self.__initialize()
+        self.__enable_disable_xprivacy(True)
 
         # If it has an inlined version
         if apk_mapping.has_key(apk.get_basename()):
