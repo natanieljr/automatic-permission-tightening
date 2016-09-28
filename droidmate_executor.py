@@ -5,7 +5,7 @@ import os
 import subprocess
 from shutil import copyfile, move
 
-from consts import DROIDMATE_FIRST_RUN, ADB_UNLOCK_SCREEN_COMMAND, ADB_REBOOT_COMMAND
+from consts import DROIDMATE_FIRST_RUN, DROIDMATE_RUN_WITH_XPRIVACY, ADB_UNLOCK_SCREEN_COMMAND, ADB_REBOOT_COMMAND
 
 logger = logging.getLogger()
 
@@ -39,13 +39,18 @@ class DroidmateExecutor(object):
         dst = os.path.join(self.tmp_directory, inlined_apk_name)
         copyfile(src, dst)
 
-    def __copy_results_to_output(self, apk):
+    def __copy_results_to_output(self, apk, scenario=None):
         """
         Copy exploration results to output directory
         :param apk: Explored APK
         """
-        logger.debug('Copying %s to results directory (%s)', apk, self.tmp_directory)
+        logger.debug('Copying %s to results directory (%s)', apk, self.output_directory)
         result_directory = os.path.join(self.output_directory, apk.get_apk_name_as_directory_name())
+
+        if scenario is not None:
+            if not os.path.exists(result_directory):
+                os.mkdir(result_directory)
+            result_directory = os.path.join(result_directory, scenario)
 
         if os.path.exists(result_directory):
             shutil.rmtree(result_directory)
@@ -55,18 +60,23 @@ class DroidmateExecutor(object):
         move(src, dst)
         assert os.path.exists(result_directory)
 
-    def __copy_results_to_fail(self, apk):
+    def __copy_results_to_fail(self, apk, scenario=None):
         """
         Copy exploration results to output directory
         :param apk: Explored APK
         """
-        logger.debug('Copying %s to results directory (%s)', apk, self.tmp_directory)
+        logger.debug('Copying %s to error directory (%s)', apk, self.error_directory)
         if os.path.exists(self.error_directory):
             shutil.rmtree(self.error_directory)
         os.mkdir(self.error_directory)
         assert os.path.exists(self.error_directory)
 
         fail_directory = os.path.join(self.error_directory, apk.get_apk_name_as_directory_name())
+
+        if scenario is not None:
+            if not os.path.exists(fail_directory):
+                os.mkdir(fail_directory)
+            fail_directory = os.path.join(fail_directory, scenario)
 
         if os.path.exists(fail_directory):
             shutil.rmtree(fail_directory)
@@ -86,7 +96,7 @@ class DroidmateExecutor(object):
     def __run_droidmate(self, droidmate_command):
         """
         Execute DroidMate's exploration on target APK folder
-        :param directory: Directory containing the original APKs
+        :param droidmate_command: Command to be executed
         """
         logging.debug("Restarting device, ADB command: %s", ADB_REBOOT_COMMAND)
         os.system(ADB_REBOOT_COMMAND)
@@ -102,13 +112,7 @@ class DroidmateExecutor(object):
         #assert signal == 0
         return signal
 
-    def first_exploration(self, apks, apk_mapping):
-        """
-        Perform the first APK exploration using Droidmate. Each APK is copied and executed alone. It's results and
-        execution logs are stored separatelly into different direcotires
-        :param apks: List of APKs to be inlined
-        :param apk_mapping: List of mapped original/inlined APKs
-        """
+    def __initialize(self):
         assert self.output_directory is not None
         assert self.inlined_apk_directory is not None
         assert self.tmp_directory is not None
@@ -117,6 +121,15 @@ class DroidmateExecutor(object):
         if not os.path.exists(self.output_directory):
             os.mkdir(self.output_directory)
         assert os.path.exists(self.output_directory)
+
+    def first_exploration(self, apks, apk_mapping):
+        """
+        Perform the first APK exploration using Droidmate. Each APK is copied and executed alone. It's results and
+        execution logs are stored separatelly into different direcotires
+        :param apks: List of APKs to be explored
+        :param apk_mapping: List of mapped original/inlined APKs
+        """
+        self.__initialize()
 
         # Foreach APK
         for apk in apks:
@@ -132,7 +145,7 @@ class DroidmateExecutor(object):
                 self.__clear_execution_directories()
 
                 # Run Droidmate's first explorarion
-                logger.debug(DROIDMATE_FIRST_RUN)
+                logger.debug(DROIDMATE_FIRST_RUN[1])
                 result = self.__run_droidmate(DROIDMATE_FIRST_RUN)
 
                 # If exploration was successful
@@ -143,3 +156,40 @@ class DroidmateExecutor(object):
                     logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
                                 apk, result, self.error_directory)
                     self.__copy_results_to_fail(apk)
+
+    def run_scenario(self, apk, apk_mapping, configuration_file):
+        """
+        Perform the first APK exploration using Droidmate. Each APK is copied and executed alone. It's results and
+        execution logs are stored separatelly into different direcotires
+        :param apk: APK to be explored
+        :param apk_mapping: List of mapped original/inlined APKs
+        """
+        self.__initialize()
+
+        # If it has an inlined version
+        if apk_mapping.has_key(apk.get_basename()):
+            logger.debug('Exploring APK %s with scenario %s', apk, configuration_file)
+            inlined_apk_name = apk_mapping[apk.get_basename()]
+
+            # Copy APK to temporary folder
+            self.__copy_apk_to_tmp(inlined_apk_name)
+
+            # Remove previous Droidmate execution logs
+            self.__clear_execution_directories()
+
+            # Run Droidmate's first explorarion
+            command = DROIDMATE_RUN_WITH_XPRIVACY[:]
+            command[1] = command[1] % ('%s', configuration_file)
+            logger.debug(command)
+            result = self.__run_droidmate(command)
+
+            # If exploration was successful
+            if result == 0:
+                # Copy exploration results to output directory
+                self.__copy_results_to_output(apk, scenario=configuration_file)
+            else:
+                logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
+                            apk, result, self.error_directory)
+                self.__copy_results_to_fail(apk, scenario=configuration_file)
+        else:
+            logger.warn('Inlined version of %s not found', apk)

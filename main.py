@@ -188,7 +188,29 @@ class Main(object):
                 logger.error('It is not possible to generate scenarios without extracting APIs')
 
         for apk in self.apks:
-            logger.debug("Processing APK %s", apk)
+            # Run scenarios
+            if self.args.runScenarios:
+                assert self.args.inline
+                assert self.args.generateScenarios
+                if apk_mapping.has_key(apk.get_basename()):
+                    executor_output_dir = os.path.dirname(executor_output_dir)
+                    executor_output_dir = os.path.join(executor_output_dir, '1-api-blocked')
+
+                    if not os.path.exists(executor_output_dir):
+                        os.mkdir(executor_output_dir)
+
+                    droidmate_executor = DroidmateExecutor(inlined_apk_dir, executor_output_dir, executor_tmp_dir)
+                    droidmate_executor.error_directory = os.path.join(executor_output_dir, 'fail')
+
+                    # Locate the scenario files
+                    for f in os.listdir(scenario_output_dir):
+                        scenario_list = os.path.join(scenario_output_dir, f)
+                        if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
+                            for scenario in os.listdir(scenario_list):
+                                tmp = os.path.join(scenario_list, scenario)
+                                droidmate_executor.run_scenario(apk, apk_mapping, tmp )
+            else:
+                logger.info("Skipping 'Run Scenarios'")
 
 
 if __name__ == "__main__":
@@ -251,9 +273,9 @@ if __name__ == "__main__":
     parser.set_defaults(generateScenarios=True)
 
     # Run scenarios
-    parser.add_argument(ARG_GENERATE_SCENARIOS, dest='runScenarios', action='store_true',
+    parser.add_argument(ARG_RUN_SCENARIOS, dest='runScenarios', action='store_true',
                         help="Generate XPrivacy's configuration files for different scenarios")
-    parser.add_argument(ARG_GENERATE_SCENARIOS_NO, dest='runScenarios', action='store_false',
+    parser.add_argument(ARG_RUN_SCENARIOS_NO, dest='runScenarios', action='store_false',
                         help="Do not generate XPrivacy's configuration files for different scenarios")
     parser.set_defaults(runScenarios=True)
 
