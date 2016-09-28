@@ -61,9 +61,16 @@ class XPrivacyConfigurationExtractor(object):
     def process(self, apks):
         logger.debug("Initializing XPrivacy's configuration extraction")
         logger.debug("Configuration files will be stored in %s", self.output_directory)
+
+        if not os.path.exists(self.output_directory):
+            os.mkdir(self.output_directory)
+
+        assert os.path.exists(self.output_directory)
+        assert os.path.isdir(self.output_directory)
+
         for apk in apks:
             logger.info("Extracting configuration for APK %s", apk)
-            file_name = apk.get_basename().replace('.apk', '')
+            file_name = apk.get_apk_name_as_directory_name()
 
             # Install APK into device
             self.__install_apk(apk)
