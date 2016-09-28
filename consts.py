@@ -19,13 +19,15 @@ ARG_EXPLORE = '--explore'
 ARG_EXPLORE_NO = '--no-explore'
 ARG_EXTRACT_APIS = '--extractAPIs'
 ARG_EXTRACT_APIS_NO = '--no-extractAPIs'
-
-EXTRACTED_CFG_FOLDER = 'extractedConfiguration'
+ARG_GENERATE_SCENARIOS = '--generateScenarios'
+ARG_GENERATE_SCENARIOS_NO = '--no-generateScenarios'
+ARG_RUN_SCENARIOS = '--runScenarios'
+ARG_RUN_SCENARIOS_NO = '--no-runScenarios'
 
 # ADB commands
 ADB_INSTALL_COMMAND = 'adb install %s'
 ADB_EXPORT_COMMAND = 'adb shell am start -a biz.bokhorst.xprivacy.action.EXPORT -e FileName /storage/emulated/0/.xprivacy/%s.xml'
-ADB_PULL_COMMAND = 'adb pull /storage/emulated/0/.xprivacy/%s.xml %s%s.xml'
+ADB_PULL_COMMAND = 'adb pull /storage/emulated/0/.xprivacy/%s.xml %s/%s.xml'
 ADB_UNINSTALL_COMMAND = 'adb uninstall %s'
 ADB_REBOOT_COMMAND = 'adb reboot'
 ADB_UNLOCK_SCREEN_COMMAND = 'adb shell input keyevent 82'
@@ -108,3 +110,4 @@ DROIDMATE_BASE = ['"<JDK>\\bin\\java" '.replace("<JDK>", JDK_LOCATION),
 
 DROIDMATE_INLINE_APK = [DROIDMATE_BASE[0], DROIDMATE_BASE[1] + ' -inline -apksDir=%s']
 DROIDMATE_FIRST_RUN = [DROIDMATE_BASE[0], DROIDMATE_BASE[1] + ' -apksDir=%s -resetEvery=30 -timeLimit=120 -randomSeed=0 -androidApi=api23']
+DROIDMATE_RUN_WITH_XPRIVACY = [DROIDMATE_FIRST_RUN[0], DROIDMATE_FIRST_RUN[1] + ' -xPrivacyConfigurationFile=%s']

@@ -10,6 +10,7 @@ from configuration_extractor import XPrivacyConfigurationExtractor
 from apk_inliner import ApkInliner
 from droidmate_executor import DroidmateExecutor
 from summary_processor import SummaryProcessor
+from scenario_generator import ScenarioGenerator
 
 logger = logging.getLogger()
 
@@ -105,11 +106,13 @@ class Main(object):
         logger.info("Processing APK(s)")
 
         # Define the output directory for the extracted configuration files. Use application's temporary directory
+        config_extraction_dir = os.path.join(args.tmpDir, 'extracted-config')
+
         if self.args.extractConfig:
-            self.configurator_extractor.output_directory = os.path.join(args.tmpDir, EXTRACTED_CFG_FOLDER)
+            self.configurator_extractor.output_directory = config_extraction_dir
             self.configurator_extractor.process(self.apks)
         else:
-            logger.debug("Skipping 'Configuration extraction'")
+            logger.info("Skipping 'Configuration extraction'")
 
         inlined_apk_dir = self.get_inlined_apk_dir()
 
@@ -117,13 +120,20 @@ class Main(object):
         if self.args.inline:
             apk_inliner = ApkInliner()
             apk_inliner.output_directory = inlined_apk_dir
-            apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk_inliner"))
+            apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk-inliner"))
             apk_mapping = apk_inliner.process(self.apks)
         else:
-            logger.debug("Skipping 'Inline APKs'")
+            logger.info("Skipping 'Inline APKs'")
 
         executor_tmp_dir = os.path.join(self.args.tmpDir, 'processing')
-        executor_output_dir = os.path.join(self.args.tmpDir, 'first-run')
+        executor_output_dir = os.path.join(self.args.tmpDir, 'exploration')
+
+        if not os.path.exists(executor_output_dir):
+            os.mkdir(executor_output_dir)
+
+        assert os.path.exists(executor_output_dir)
+
+        executor_output_dir = os.path.join(executor_output_dir, 'first-run')
 
         # Run initial exploration
         if self.args.explore:
@@ -131,7 +141,7 @@ class Main(object):
             droidmate_executor = DroidmateExecutor(inlined_apk_dir, executor_output_dir, executor_tmp_dir)
             droidmate_executor.first_exploration(self.apks, apk_mapping)
         else:
-            logger.debug("Skipping 'Explore'")
+            logger.info("Skipping 'Explore'")
 
         # Extract APIs
         if self.args.extractAPIs:
@@ -161,6 +171,21 @@ class Main(object):
                 logger.debug('--%s\t%d', method_signature, count)
         else:
             logger.debug("Skipping 'Extract APIs'")
+
+        if self.args.generateScenarios:
+            if self.args.extractAPIs:
+                scenario_output_dir = os.path.join(self.args.tmpDir, 'scenarios')
+
+                if not os.path.exists(scenario_output_dir):
+                    os.mkdir(scenario_output_dir)
+
+                assert os.path.exists(scenario_output_dir)
+
+                scenario_output_dir = os.path.join(scenario_output_dir, '1-api-blocked')
+                scenario_generator = ScenarioGenerator(config_extraction_dir, scenario_output_dir)
+                scenario_generator.generate_scenarios(summarized_api_list_apk)
+            else:
+                logger.error('It is not possible to generate scenarios without extracting APIs')
 
         for apk in self.apks:
             logger.debug("Processing APK %s", apk)
@@ -208,15 +233,30 @@ if __name__ == "__main__":
     parser.add_argument(ARG_EXPLORE, dest='explore', action='store_true',
                         help="Execute 'Run initial exploration' process")
     parser.add_argument(ARG_EXPLORE_NO, dest='explore', action='store_false',
-                        help="Execute 'Run initial exploration' process")
+                        help="Do not execute 'Run initial exploration' process")
     parser.set_defaults(explore=True)
 
     # Extract APIs from summary
     parser.add_argument(ARG_EXTRACT_APIS, dest='extractAPIs', action='store_true',
                         help="Execute 'Extract API list' process")
     parser.add_argument(ARG_EXTRACT_APIS_NO, dest='extractAPIs', action='store_false',
-                        help="Execute 'Extract API list' process")
+                        help="Do not execute 'Extract API list' process")
     parser.set_defaults(extractAPIs=True)
+
+    # Generate scenarios
+    parser.add_argument(ARG_GENERATE_SCENARIOS, dest='generateScenarios', action='store_true',
+                        help="Generate XPrivacy's configuration files for different scenarios")
+    parser.add_argument(ARG_GENERATE_SCENARIOS_NO, dest='generateScenarios', action='store_false',
+                        help="Do not generate XPrivacy's configuration files for different scenarios")
+    parser.set_defaults(generateScenarios=True)
+
+    # Run scenarios
+    parser.add_argument(ARG_GENERATE_SCENARIOS, dest='runScenarios', action='store_true',
+                        help="Generate XPrivacy's configuration files for different scenarios")
+    parser.add_argument(ARG_GENERATE_SCENARIOS_NO, dest='runScenarios', action='store_false',
+                        help="Do not generate XPrivacy's configuration files for different scenarios")
+    parser.set_defaults(runScenarios=True)
+
 
     args = parser.parse_args()
 
