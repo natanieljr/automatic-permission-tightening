@@ -7,4 +7,6 @@ except ImportError:
         def emit(self, record):
             pass
 
+handler = logging.FileHandler('execution.log')
+logging.getLogger(__name__).addHandler(handler)
 logging.getLogger(__name__).addHandler(NullHandler())
