@@ -58,14 +58,30 @@ mapping = {
 
 
 class ScenarioGenerator(object):
+    """
+    Class that generate execution scenarios based on the identified API list
+    """
+
     config_directory = None
     output_directory = None
 
     def __init__(self, config_directory, output_directory):
+        """
+        Initialize object
+        :param config_directory: Directory where XPrivacy's configuration files are stored
+        :param output_directory: Directory where the newly generated scenarios will be stored
+        """
         self.config_directory = config_directory
         self.output_directory = output_directory
 
     def __get_filename(self, apk_directory, api):
+        """
+        Create a file name to a scenario based on the API that is being restricted
+        :param apk_directory: Directory where the application specific scenarios should be stored
+        :param api: API that is being restricted in this scenario
+        :return: The filename for the scenario configuration file
+        """
+
         # Define scenario filename
         if 'content://' in api:
             # Identify opening ' and ignore it
@@ -86,6 +102,13 @@ class ScenarioGenerator(object):
 
     @staticmethod
     def __sort_api_list(api_list, api_count):
+        """
+        Sort API listr based on the number of times it was invoked
+        :param api_list: List of APIs
+        :param api_count: Number of times each API was invoked
+        :return: Sorted API_LIST, API_COUNT list
+        """
+
         # Sort APIs
         sorted_api_list = []
         sorted_api_count = []
@@ -97,6 +120,12 @@ class ScenarioGenerator(object):
 
     @staticmethod
     def __get_package_id(config, apk):
+        """
+        Identify the package ID on XPrivacy's configuration file. This ID is used to index all permissions.
+        :param config:
+        :param apk:
+        :return:
+        """
         package = apk.get_package()
 
         id = -1
@@ -110,18 +139,12 @@ class ScenarioGenerator(object):
 
         return id
 
-    @staticmethod
-    def __replace_string_on_array(data, old, new):
-        tmp = data[:]
-        idx = len(data) - 1
-
-        while idx >= 0:
-            tmp[idx] = tmp[idx].replace(old, new)
-            idx -= 1
-
-        return tmp
-
     def generate_scenarios(self, summarized_api_list_apk):
+        """
+        Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
+        :param summarized_api_list_apk: List of API calls per APK
+        :return: void
+        """
         if not os.path.exists(self.output_directory):
             os.mkdir(self.output_directory)
 
@@ -161,7 +184,7 @@ class ScenarioGenerator(object):
                             false_value = change % (package_id, 'false')
                             true_value = change % (package_id, 'true')
 
-                            new_config = ScenarioGenerator.__replace_string_on_array(new_config, false_value, true_value)
+                            new_config = [new_config.replace(false_value, true_value) for w in new_config]
 
                         # Write output file
                         f = open(output_filename, 'w')
