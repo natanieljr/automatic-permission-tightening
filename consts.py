@@ -114,5 +114,5 @@ DROIDMATE_BASE = ['"<JDK>\\bin\\java" '.replace("<JDK>", JDK_LOCATION),
                   ]
 
 DROIDMATE_INLINE_APK = [DROIDMATE_BASE[0], DROIDMATE_BASE[1] + ' -inline -apksDir=%s']
-DROIDMATE_FIRST_RUN = [DROIDMATE_BASE[0], DROIDMATE_BASE[1] + ' -apksDir=%s -resetEvery=30 -timeLimit=900 -randomSeed=0 -androidApi=api23']
+DROIDMATE_FIRST_RUN = [DROIDMATE_BASE[0], DROIDMATE_BASE[1] + ' -apksDir=%s -resetEvery=30 -timeLimit=900 -randomSeed=0 -getValidGuiSnapshotRetryAttempts=2 -androidApi=api23']
 DROIDMATE_RUN_WITH_XPRIVACY = [DROIDMATE_FIRST_RUN[0], DROIDMATE_FIRST_RUN[1] + ' -xPrivacyConfigurationFile=%s']
