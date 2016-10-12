@@ -190,14 +190,14 @@ class DroidmateExecutor(object):
                 logger.debug(DROIDMATE_FIRST_RUN[1])
                 result = self.__run_droidmate(DROIDMATE_FIRST_RUN)
 
-                # If exploration was successful
-                if result == 0:
-                    # Copy exploration results to output directory
-                    self.__copy_results_to_output(apk)
-                else:
-                    logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
-                                apk, result, self.error_directory)
-                    self.__copy_results_to_fail(apk)
+                # # If exploration was successful
+                # if result == 0:
+                # Copy exploration results to output directory
+                self.__copy_results_to_output(apk)
+                # else:
+                #     logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
+                #                 apk, result, self.error_directory)
+                #     self.__copy_results_to_fail(apk)
 
     def run_scenario(self, apk, apk_mapping, configuration_file):
         """
