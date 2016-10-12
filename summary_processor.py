@@ -38,6 +38,10 @@ class SummaryProcessor(object):
                     offset = 98
                     if '[' in line:
                         start_idx = line.index('[')
+                        # Fix for problem in exploration of 'com.wetter.androidclient_v2_3_1', where a command was being split in two lines
+                        if not ']' in line:
+                            i += 1
+                            line += lines[i]
                         end_idx = line.index(']')
                         caption_size = end_idx - start_idx
 
