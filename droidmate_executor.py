@@ -22,7 +22,7 @@ class DroidmateExecutor(object):
     def __init__(self, inlined_apk_directory, output_directory, tmp_directory):
         self.output_directory = output_directory
         self.inlined_apk_directory = inlined_apk_directory
-        self.error_directory = os.path.join(inlined_apk_directory, 'fail')
+        self.error_directory = os.path.join(output_directory, 'fail')
         self.tmp_directory = tmp_directory
 
     def __copy_apk_to_tmp(self, inlined_apk_name):
@@ -51,7 +51,7 @@ class DroidmateExecutor(object):
         if scenario is not None:
             if not os.path.exists(result_directory):
                 os.mkdir(result_directory)
-            result_directory = os.path.join(result_directory, scenario)
+            result_directory = os.path.join(result_directory, os.path.basename(scenario))
 
         if os.path.exists(result_directory):
             shutil.rmtree(result_directory)
@@ -77,7 +77,7 @@ class DroidmateExecutor(object):
         if scenario is not None:
             if not os.path.exists(fail_directory):
                 os.mkdir(fail_directory)
-            fail_directory = os.path.join(fail_directory, scenario)
+            fail_directory = os.path.join(fail_directory, os.path.basename(scenario))
 
         if os.path.exists(fail_directory):
             shutil.rmtree(fail_directory)
@@ -124,6 +124,11 @@ class DroidmateExecutor(object):
         assert os.path.exists(self.output_directory)
 
     def __enable_disable_xprivacy(self, enable):
+
+        logger.warn('XPrivacy enabler/disabler not working. Have to do it manually for now')
+
+        return
+
         if enable:
             logger.info('Activating XPrivacy')
         else:
@@ -220,7 +225,12 @@ class DroidmateExecutor(object):
             # Remove previous Droidmate execution logs
             self.__clear_execution_directories()
 
-            # Run Droidmate's first explorarion
+            # Remove configuration file, just for precaution
+            command = ADB_REMOVE_CONFIG
+            logging.debug("Removing previous configuration file, ADB command: %s", command)
+            os.system(command)
+
+            # Run Droidmate's scenario
             command = DROIDMATE_RUN_WITH_XPRIVACY[:]
             command[1] = command[1] % ('%s', configuration_file)
             logger.debug(command)
