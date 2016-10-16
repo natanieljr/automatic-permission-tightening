@@ -6,16 +6,25 @@ mapping = {
     "android.app.ActivityManager->getRunningTasks(int)":
         ['Name="system" Id="%d" Restricted="%s" Asked="false" />',
          '<Restriction Id="%d" Name="system" Method="Srv_getTasks" Restricted="%s" Asked="false" />'],
+    "android.app.ActivityManager->getRecentTasks(int,int)":
+        ['Name="system" Id="%d" Restricted="%s" Asked="false" />',
+         '<Restriction Id="%d" Name="system" Method="Srv_getRecentTasks" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://call_log/calls',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
         ['<Restriction Id="%d" Name="calling" Restricted="%s" Asked="false" />',
          '<Restriction Id="%d" Name="calling" Method="CallLogProvider" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/contacts',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
         ['<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
          '<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
+    "android.content.ContentResolver->query('content://com.android.contacts/contacts/1/photo',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
+        ['<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
+         '<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/data',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
         ['<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
          '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/data/postals',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
+        ['<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
+         '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
+    "android.content.ContentResolver->query('content://com.android.contacts/data/phones',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
         ['<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
          '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/profile',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
@@ -139,6 +148,63 @@ class ScenarioGenerator(object):
 
         return id
 
+    @staticmethod
+    def __read_configuration_file(config_path):
+        """
+        Read the configuration file and mark all apis as "do not ask"
+        :param config_path: Configuration file path
+        :return: Configuration data
+        """
+        f = file(config_path)
+        config = f.readlines()
+        f.close()
+
+        # Remove any permission that may be marked as "ask"
+        config = [w.replace('Asked="true"', 'Asked="false"') for w in config]
+
+        return config
+
+    @staticmethod
+    def __clean_configuration(config, package_id):
+        """
+        Remove all other application from the configuration
+        :param config: Configuration data
+        :param package_id: Id of the package that should remain in the configuration file
+        :return: Clean configuration data
+        """
+        # Remove other applications from configuration file
+        tmp = [w for w in config
+               if (('"%d"' % package_id) in w)
+               or ("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" in w)
+               or ("<XPrivacy>" in w)
+               or ("</XPrivacy>" in w)
+               ]
+
+        tmp = [w for w in tmp if not '"OnDemand"' in w and not '"true"' in w]
+
+        new_data = ['  <Setting Id="%d" Type="" Name="Blacklist" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="Freeze" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="IntentWall" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="ModifyTime" Value="1473796514705" /> ',
+                    '  <Setting Id="%d" Type="" Name="NoResolve" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="NoUsageData" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="Notify" Value="true" /> ',
+                    '  <Setting Id="%d" Type="" Name="OnDemand" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="OnDemandSystem" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="PermMan" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="Resolve" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="SafeMode" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="State" Value="0" /> ',
+                    '  <Setting Id="%d" Type="" Name="TestVersions" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="Updates" Value="false" /> ',
+                    '  <Setting Id="%d" Type="" Name="WhitelistNoModify" Value="false" />  '
+                    ]
+
+        for l in reversed(new_data):
+            tmp.insert(3, l % package_id + '\n')
+
+        return tmp
+
     def generate_scenarios(self, summarized_api_list_apk):
         """
         Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
@@ -155,12 +221,13 @@ class ScenarioGenerator(object):
 
             base_config_path = os.path.join(self.config_directory, apk.get_apk_name_as_directory_name()) + '.xml'
             if os.path.exists(base_config_path):
-                f = file(base_config_path)
-                base_config = f.readlines()
-                f.close()
+
+                base_config = ScenarioGenerator.__read_configuration_file(base_config_path)
 
                 package_id = self.__get_package_id(base_config, apk)
                 apk_directory = os.path.join(self.output_directory, apk.get_apk_name_as_directory_name())
+
+                base_config = ScenarioGenerator.__clean_configuration(base_config, package_id)
 
                 if not os.path.exists(apk_directory):
                     os.mkdir(apk_directory)
@@ -170,13 +237,15 @@ class ScenarioGenerator(object):
                 # Sort APIs
                 sorted_api_list, sorted_api_count = ScenarioGenerator.__sort_api_list(api_list, api_count)
 
-
                 for api, count in zip(sorted_api_list, sorted_api_count):
-                    logger.debug('Relevant API found %s (%d)', api, count)
+                    logger.debug('API found %s (%d)', api, count)
                     # Check is is mapped
                     if api in mapping.keys():
+                        logger.info('API is mockable, generating scenario (%s)', api)
                         pending_changes = mapping[api]
                         output_filename = self.__get_filename(apk_directory, api)
+                        logger.info('Scenario filename: %s', output_filename)
+                        save_file = True
 
                         new_config = base_config[:]
                         # Perform changes
@@ -184,15 +253,21 @@ class ScenarioGenerator(object):
                             false_value = change % (package_id, 'false')
                             true_value = change % (package_id, 'true')
 
-                            new_config = [new_config.replace(false_value, true_value) for w in new_config]
+                            tmp_config = new_config[:]
+                            new_config = [w.replace(false_value, true_value) for w in new_config]
 
-                        # Write output file
-                        f = open(output_filename, 'w')
-                        f.writelines(new_config)
-                        f.close()
+                            #assert new_config != tmp_config
+                            if new_config == tmp_config:
+                                logger.error('Unable to restrict API %s, item not found in configuration file (%s)' % (true_value, apk))
+                                save_file = False
+
+                        if save_file:
+                            # Write output file
+                            f = open(output_filename, 'w')
+                            f.writelines(new_config)
+                            f.close()
 
                     else:
-                        #logger.debug("Unmapped API %s", api)
-                        pass
+                        logger.debug('API is not mockable (%s)', api)
             else:
                 logger.error('Base XPrivacy configuration file not found for %s', apk)
