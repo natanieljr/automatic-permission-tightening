@@ -67,9 +67,8 @@ class DroidmateExecutor(object):
         :param apk: Explored APK
         """
         logger.debug('Copying %s to error directory (%s)', apk, self.error_directory)
-        if os.path.exists(self.error_directory):
-            shutil.rmtree(self.error_directory)
-        os.mkdir(self.error_directory)
+        if not os.path.exists(self.error_directory):
+            os.mkdir(self.error_directory)
         assert os.path.exists(self.error_directory)
 
         fail_directory = os.path.join(self.error_directory, apk.get_apk_name_as_directory_name())
@@ -236,13 +235,14 @@ class DroidmateExecutor(object):
             logger.debug(command)
             result = self.__run_droidmate(command)
 
-            # If exploration was successful
+            self.__copy_results_to_output(apk, scenario=configuration_file)
+            '''# If exploration was successful
             if result == 0:
                 # Copy exploration results to output directory
                 self.__copy_results_to_output(apk, scenario=configuration_file)
             else:
                 logger.warn('Error while exploring %s process signal = %d, for details check the logs at %s',
                             apk, result, self.error_directory)
-                self.__copy_results_to_fail(apk, scenario=configuration_file)
+                self.__copy_results_to_fail(apk, scenario=configuration_file)'''
         else:
             logger.warn('Inlined version of %s not found', apk)

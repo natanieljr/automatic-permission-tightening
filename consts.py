@@ -33,6 +33,7 @@ ADB_REBOOT_COMMAND = 'adb reboot'
 ADB_UNLOCK_SCREEN_COMMAND = 'adb shell input keyevent 82'
 # Returns Parcel(00000000 00000000) if locked and Parcel(00000000 00000001) if unlocked
 ADB_CHECK_LOCKED_SCREEN_COMMAND = 'adb shell service call power 12'
+ADB_REMOVE_CONFIG = "adb shell 'rm /storage/emulated/0/.xprivacy/xPrivacyConfig.xml'"
 
 # XPrivacy enabler/disabler
 XPRIVACY_ENABLER_BASE = 'resources\\xprivacy_enabler_base.apk'

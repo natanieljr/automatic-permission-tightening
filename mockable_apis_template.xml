@@ -1,0 +1,352 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<XPrivacy>
+  <PackageInfo Id="**ID**" Name="**PACKAGE**" />
+  <Setting Id="**ID**" Type="" Name="Blacklist" Value="false" />
+  <Setting Id="**ID**" Type="" Name="Freeze" Value="false" />
+  <Setting Id="**ID**" Type="" Name="IntentWall" Value="false" />
+  <Setting Id="**ID**" Type="" Name="ModifyTime" Value="1473796514705" />
+  <Setting Id="**ID**" Type="" Name="NoResolve" Value="false" />
+  <Setting Id="**ID**" Type="" Name="NoUsageData" Value="false" />
+  <Setting Id="**ID**" Type="" Name="Notify" Value="true" />
+  <Setting Id="**ID**" Type="" Name="OnDemand" Value="false" />
+  <Setting Id="**ID**" Type="" Name="OnDemandSystem" Value="false" />
+  <Setting Id="**ID**" Type="" Name="PermMan" Value="false" />
+  <Setting Id="**ID**" Type="" Name="Resolve" Value="false" />
+  <Setting Id="**ID**" Type="" Name="SafeMode" Value="false" />
+  <Setting Id="**ID**" Type="" Name="State" Value="1" />
+  <Setting Id="**ID**" Type="" Name="TestVersions" Value="false" />
+  <Setting Id="**ID**" Type="" Name="Updates" Value="false" />
+  <Setting Id="**ID**" Type="" Name="WhitelistNoModify" Value="false" />
+
+  <Restriction Id="**ID**" Name="accounts" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getAccounts" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getAccountsAsUser" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getAccountsByFeatures" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getAccountsForPackage" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getCurrentSyncs" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getCurrentSyncsAsUser" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="Srv_getSharedAccountsAsUser" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="blockingGetAuthToken" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getAuthToken" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getAuthTokenByFeatures" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getAutenthicatorTypes" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getSuncAdapterTypes" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getTokenGoogle" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="getTokenWithNotificationGoogle" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="accounts" Method="hasFeatures" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="browser" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="browser" Method="BrowserProvider2" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="browser" Method="Downloads" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="calendar" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calendar" Method="CalendarProvider2" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="calling" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="CallLogProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="SIP.isApiSupported" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="SIP.isSipWifiOnly" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="SIP.isVoidSupported" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="SIP.newInstance" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="Srv_sendData" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="Srv_sendMultipartText" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="Srv_sendText" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="android.intent.action.CALL" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="android.intent.action.DIAL" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="android.intent.action.NEW_OUTGOING_CALL" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="android.intent.action.RESPOND_VIA_MESSAGE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="calling" Method="sendMultimediaMessage" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="clipboard" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="clipboard" Method="Srv_addPrimaryClipChangedListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="clipboard" Method="Srv_getPrimaryClip" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="clipboard" Method="Srv_getPrimaryClipDescription" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="clipboard" Method="Srv_hasClipboardText" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="clipboard" Method="Srv_hasPrimaryClip" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="contacts" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="lccProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/contacts" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/data" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/people" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/phone_lookup" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/profile" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="contacts" Method="contacts/raw_contacts" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="dictionary" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="dictionary" Method="UserDictionary" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="email" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="email" Method="EMailProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="email" Method="GMailProvider" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="identification" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="%cid" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="%hostname" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="%imei" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="%macaddr" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="%serialno" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="/proc" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="/sys/block/.../cid" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="/sys/class/.../cid" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="/system/build.prop" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="AdvertisingId" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="Cast.getDeviceId" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="Cast.getIpAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="GservicesProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="InputDevice.getDescriptor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="InputDevice.getName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="SERIAL" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="Srv_Android_ID" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="USD.getDeviceId" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="USB.getDeviceName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="identification" Method="USB.getSerialNumber" Restricted="**RESTRICTED**" Asked="false" />
+  
+  <Restriction Id="**ID**" Name="internet" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="Connectivity.getActiveNetworkInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="Connectivity.getAllNetworkInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="Connectivity.getNetworkInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="InetAddress.getAllByName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="InetAddress.getAllByNameOnNet" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="InetAddress.getByAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="InetAddress.getByName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="InetAddress.getByNameOnNet" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="IpPrefix.getAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="IpPrefix.getRawAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="LinkProperties.getAddresses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="LinkProperties.getAllAddresses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="LinkProperties.getLinkAddresses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="LinkProperties.getStackedLinks" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInfo.getDetailedState" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInfo.getState" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInfo.isConnected" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInfo.IsConnectedOrConnecting" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInterface.getByInder" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInterface.getByInetAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInterface.getByName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="NetworkInterface.getNetworkInterfaces" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="WiFi.Srv_getConnectionInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="connect" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="inet" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="inet_admin" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="inet_bw" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="inet_mesh" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="internet" Method="inet_vpn" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="location" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="GMS.addGeofences" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="GMS.getLastLocation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="GMS.requestActivityUpdates" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="GMS.requestLocationUpdates" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV1.enableMyLocation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.getMyLocation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.getPosition" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.setLocationSource" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.setOnMapClickListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.setOnMapLongClickListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="MapV2.setOnMyLocationChangeListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_addGpsMeasurementListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_addGpsNavigationMessageListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_addGpsStatusListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_enableLocationUpdates" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_enableLocationUpdatesForSubscriber" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getAllCellInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getAllProviders" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getBestProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getCellLocation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getLastLocation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getNeighboringCellInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_getProviders" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_isProviderEnabled" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_listen" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_requestGeofence" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_requestLocationUpdates" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Srv_sendExtraCommand" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="location" Method="Wifi.Srv_getScanResults" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="media" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Audio.startRecording" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.permission" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.setOneShotPreviewCallback" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.setPreviewCallback" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.setPreviewCallbackWithBuffer" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.setPreviewDisplay" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.setPreviewTexture" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.startPreview" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera.takePicture" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera2.capture" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera2.captureBurst" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Camera2.setRepeatingBurst" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="MediaRecorder.setOutputFile" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="MediaRecorder.start" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Record.Audio.permission" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="Record.Video.permission" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="android.media.action.IMAGE_CAPTURE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="android.media.action.IMAGE_CAPTURE_SECURE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="media" Method="android.media.action.VIDEO_CAPTURE" Restricted="**RESTRICTED**" Asked="false" />
+  
+  <Restriction Id="**ID**" Name="messages" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="MmsProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="MmsSmsProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="Srv_getAllMessagesFromlccEf" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="VoicemailContentProvider" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="android.intent.action.DATA_SMS_RECEIVED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="android.provider.Telephony.SMS_DELIVER" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="android.provider.Telephony.SMS_RECEIVED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="android.provider.Telephony.WAP_PUSH_DELIVER" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="android.provider.Telephony.WAP_PUSH_RECEIVED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="messages" Method="getCarreirConfigValues" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="network" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Bluetooth.Srv_getAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Bluetooth.Srv_getName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Bluetooth.getAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Bluetooth.getBondedDevices" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="NetworkInfo.getExtraInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="NetworkInterface.getHardwareAddress" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="NetworkInterface.getInetAddresses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="NetworkInterface.getInterfaceAddresses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Srv_Default_DNS" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="Srv_Wifi_Country" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="WiFi.Srv_getBatchedScanResults" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="WiFi.Srv_getConfiguredNetworks" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="WiFi.Srv_getConnectionInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="WiFi.Srv_getDhcpInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="WiFi.Srv_getWifiApConfiguration" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="android.nfc.action.ADAPTER_STATE_CHANGED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="android.nfc.action.NDEF_DISCOVERED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="android.nfc.action.TAG_DISCOVERED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="android.nfc.action.TECH_DISCOVERED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="getDefaultAdapted" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="network" Method="getNfcAdapter" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="notification" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="notification" Method="android.service.notification.NotificationListenerService" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="notification" Method="com.google.android.c2dm.intent.RECEIVE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="notification" Method="com.google.android.c2dm.intent.REGISTRATION" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="overlay" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="overlay" Method="addView" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="phone" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Configuration.MCC" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Configuration.MNC" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getCdmaMdn" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getCdmaMin" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getCompleteVoiceMailNumberForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getDeviceId5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getDeviceIdForPhone5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getGroupLevel1ForSubscriber" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getlccSerialNumberForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getImeiForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getIsimDomain5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getIsimImpi5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getIsimImpu5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getIsimIst5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getIsimPcscf5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getLine1AlphaTagForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getLine1NumberForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getMsisdnForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getNaiForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getSubscriberIdForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getVoiceMailAlphaTagForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_getVoiceMailNumberForSubscriber5" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="Srv_listen" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="TelephonyManager" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="android.intent.action.PHONE_STATE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getNetworkCountryIdo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getNetworkOperator" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getNetworkOperatorName" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getSimCountryIso" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getSimOperator" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="phone" Method="getSimOperatorName" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="sensors" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="acceleration" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="getDefaultSensor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="getSensorList" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="gravity" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="heartrate" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="humidity" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="light" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="magnetic" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="motion" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="orientation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="pressure" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="proximity" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="registerListener" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="rotation" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="step" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="sensors" Method="temperature" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="shell" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="exec" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="load" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="loadLibrary" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="sh" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="start" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="shell" Method="su" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="storage" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="getExternalStorageState" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="media" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="mtp" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="open" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openAssetFile" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openAssetFileDescriptor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openFile" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openFileDescriptor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openInputStream" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openOutputStream" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="openTypedAssetFileDescriptor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="storage" Method="sdcard" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="system" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getApplicationInfor" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getInstalledApplications" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getInstalledPackages" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getInstalledProvidersForProfile" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getPackageInfo" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getPackagerForUid" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getPackagesHoldingPermissions" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getPersistentApplications" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getPreferredPackages" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getRecentTasks" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getRunningAppProcesses" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_getTasks" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srg_getServices" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryConfigurationStats" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryContentProviders" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryEvents" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryIntentActivities" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryIntentActivityOptions" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryIntentContentProviders" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryIntentReceivers" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryIntentServices" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="Srv_queryUsageStats" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.EXTERNAL_APPLICATIONS_AVAILABLE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.EXTERNAL_APPLICATIONS_UNAVAILABLE" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_ADDED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_CHANGED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_DATA_CLEARED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_FIRST_LAUNCH" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_FULLY_REMOVED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_NEEDS_VERIFICATION" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_REMOVED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_REPLACED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_RESTARTED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="android.intent.action.PACKAGE_VERIFIED" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="system" Method="queryBroadcastReceivers" Restricted="**RESTRICTED**" Asked="false" />
+
+  <Restriction Id="**ID**" Name="view" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="GMS5.view" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="Srv_android.intent.action.VIEW" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="getDefaultUserAgent" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="getUserAgent" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="getUserAgentString" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="initUserAgentString" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="loadUrl" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="postUrl" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="setUserAgent" Restricted="**RESTRICTED**" Asked="false" />
+  <Restriction Id="**ID**" Name="view" Method="setUserAgentString" Restricted="**RESTRICTED**" Asked="false" />  
+</XPrivacy>

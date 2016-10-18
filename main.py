@@ -203,12 +203,11 @@ class Main(object):
                     droidmate_executor.error_directory = os.path.join(executor_output_dir, 'fail')
 
                     # Locate the scenario files
-                    for f in os.listdir(scenario_output_dir):
-                        scenario_list = os.path.join(scenario_output_dir, f)
-                        if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
-                            for scenario in os.listdir(scenario_list):
-                                tmp = os.path.join(scenario_list, scenario)
-                                droidmate_executor.run_scenario(apk, apk_mapping, tmp )
+                    scenario_list = os.path.join(scenario_output_dir, apk.get_apk_name_as_directory_name())
+                    if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
+                        for scenario in os.listdir(scenario_list):
+                            tmp = os.path.join(scenario_list, scenario)
+                            droidmate_executor.run_scenario(apk, apk_mapping, tmp)
             else:
                 logger.info("Skipping 'Run Scenarios'")
 
