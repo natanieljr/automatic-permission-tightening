@@ -1,5 +1,5 @@
 import logging
-import os
+from auxiliar import *
 
 logger = logging.getLogger()
 mapping = {
@@ -92,13 +92,6 @@ class ScenarioGenerator(object):
         """
 
         # Define scenario filename
-        """if 'content://' in api:
-            # Identify opening ' and ignore it
-            idx = api.index("'") + 1
-            api_call_as_file_name = api[:api.index("'", idx)]
-        else:
-            api_call_as_file_name = api[:api.index('(')]"""
-
         tmp = api.split('->')
         class_name = tmp[0]
         method_name = tmp[1]
@@ -117,33 +110,10 @@ class ScenarioGenerator(object):
             .replace("://", '_') \
             .replace("://", '-') \
             .replace("/", '-')
-        """api_call_as_file_name = api_call_as_file_name.replace('->', '_') \
-            .replace("('", '__') \
-            .replace("://", '___') \
-            .replace("://", '____') \
-            .replace("/", '_____')"""
 
         filename = os.path.join(apk_directory, api_call_as_file_name) + '.xml'
 
         return filename
-
-    @staticmethod
-    def __sort_api_list(api_list, api_count):
-        """
-        Sort API listr based on the number of times it was invoked
-        :param api_list: List of APIs
-        :param api_count: Number of times each API was invoked
-        :return: Sorted API_LIST, API_COUNT list
-        """
-
-        # Sort APIs
-        sorted_api_list = []
-        sorted_api_count = []
-        for (x, y) in sorted(zip(api_list, api_count), key=lambda pair: pair[1], reverse=True):
-            sorted_api_list.append(x)
-            sorted_api_count.append(y)
-
-        return sorted_api_list, sorted_api_count
 
     @staticmethod
     def __get_package_id(config, apk):
@@ -167,34 +137,33 @@ class ScenarioGenerator(object):
         return id
 
     @staticmethod
-    def __read_configuration_file(config_path):
+    def __read_configuration_file(config_path, apk):
         """
         Read the configuration file and mark all apis as "do not ask"
         :param config_path: Configuration file path
+        :param apk: APK file
         :return: Configuration data
         """
         f = file(config_path)
         config = f.readlines()
         f.close()
+        apk_id = ScenarioGenerator.__get_package_id(config, apk)
 
-        # Remove any permission that may be marked as "ask"
-        #config = [w.replace('Asked="true"', 'Asked="false"') for w in config]
-
-        return config
+        updated_config = ScenarioGenerator.__apply_configuration_template(apk_id, apk)
+        return apk_id, updated_config
 
     @staticmethod
-    def __apply_configuration_template(config, apk):
+    def __apply_configuration_template(apk_id, apk):
         """
         Read the configuration file template
-        :param config: APK specific configuration data
-        :param apk: APK
+        :param apk_id: APK ID extracted from XPrivacy's configuration file
+        :param apk: APK file
         :return: Configuration data template
         """
         f = file('mockable_apis_template.xml')
         template_config = f.readlines()
         f.close()
 
-        apk_id = ScenarioGenerator.__get_package_id(config, apk)
         package_name = apk.get_package()
 
         # Remove any permission that may be marked as "ask"
@@ -202,116 +171,67 @@ class ScenarioGenerator(object):
 
         return new_config
 
+    @staticmethod
+    def __save_scenario_file(output_file, data):
+        # Remove all remaining **RESTRICTED**
+        tmp = [w.replace('**RESTRICTED**', 'false') for w in data]
 
-    '''@staticmethod
-    def __clean_configuration(config, package_id):
-        """
-        Remove all other application from the configuration
-        :param config: Configuration data
-        :param package_id: Id of the package that should remain in the configuration file
-        :return: Clean configuration data
-        """
-        # Remove other applications from configuration file
-        tmp = [w for w in config
-               if (('"%d"' % package_id) in w)
-               or ("<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>" in w)
-               or ("<XPrivacy>" in w)
-               or ("</XPrivacy>" in w)
-               ]
+        # Write output file
+        f = open(output_file, 'w')
+        f.writelines(tmp)
+        f.close()
 
-        tmp = [w for w in tmp if not '"OnDemand"' in w and not '"true"' in w]
+    @staticmethod
+    def __apply_changes(base_config, pending_changes, package_id, apk):
+        config = base_config[:]
+        save_file = True
+        # Perform changes
+        for change in pending_changes:
+            false_value = change % (package_id, '**RESTRICTED**')
+            true_value = change % (package_id, 'true')
 
-        new_data = ['  <Setting Id="%d" Type="" Name="Blacklist" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="Freeze" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="IntentWall" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="ModifyTime" Value="1473796514705" /> ',
-                    '  <Setting Id="%d" Type="" Name="NoResolve" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="NoUsageData" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="Notify" Value="false" /> ', #true
-                    '  <Setting Id="%d" Type="" Name="OnDemand" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="OnDemandSystem" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="PermMan" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="Resolve" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="SafeMode" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="State" Value="0" /> ',
-                    '  <Setting Id="%d" Type="" Name="TestVersions" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="Updates" Value="false" /> ',
-                    '  <Setting Id="%d" Type="" Name="WhitelistNoModify" Value="false" />  '
-                    ]
+            # Change specific configuration
+            tmp_config = config[:]
+            config = [w.replace(false_value, true_value) for w in config]
 
-        for l in reversed(new_data):
-            tmp.insert(3, l % package_id + '\n')
+            if config == tmp_config:
+                logger.error('Unable to restrict API %s, item not found in configuration file (%s)' % (true_value, apk))
+                save_file = False
 
-        return tmp'''
+        return save_file, config
 
-    def generate_scenarios(self, summarized_api_list_apk):
+    def generate_scenarios_1_api_blocked(self, summarized_api_list_apk):
         """
         Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
         :param summarized_api_list_apk: List of API calls per APK
         :return: void
         """
-        if not os.path.exists(self.output_directory):
-            os.mkdir(self.output_directory)
-
-        assert os.path.exists(self.output_directory)
+        mkdir(self.output_directory)
 
         for apk, api_list, api_count in summarized_api_list_apk:
             logger.info('Generating scenarios for %s', apk)
 
             base_config_path = os.path.join(self.config_directory, apk.get_apk_name_as_directory_name()) + '.xml'
+            apk_directory = os.path.join(self.output_directory, apk.get_apk_name_as_directory_name())
+            mkdir(apk_directory)
+
             if os.path.exists(base_config_path):
+                package_id, base_config = ScenarioGenerator.__read_configuration_file(base_config_path, apk)
 
-                base_config = ScenarioGenerator.__read_configuration_file(base_config_path)
-                base_config = ScenarioGenerator.__apply_configuration_template(base_config, apk)
-
-                package_id = self.__get_package_id(base_config, apk)
-                apk_directory = os.path.join(self.output_directory, apk.get_apk_name_as_directory_name())
-
-                #base_config = ScenarioGenerator.__clean_configuration(base_config, package_id)
-
-                if not os.path.exists(apk_directory):
-                    os.mkdir(apk_directory)
-
-                assert os.path.exists(apk_directory)
-
-                # Sort APIs
-                sorted_api_list, sorted_api_count = ScenarioGenerator.__sort_api_list(api_list, api_count)
-
-                for api, count in zip(sorted_api_list, sorted_api_count):
+                for api, count in zip(api_list, api_count):
                     logger.debug('API found %s (%d)', api, count)
                     # Check is is mapped
                     if api in mapping.keys():
-                        logger.info('API is mockable, generating scenario (%s)', api)
-                        pending_changes = mapping[api]
                         output_filename = self.__get_filename(apk_directory, api)
-                        logger.info('Scenario filename: %s', output_filename)
-                        save_file = True
+                        logger.info('API is mockable, generating scenario (%s)', output_filename)
 
-                        new_config = base_config[:]
+                        pending_changes = mapping[api]
+
                         # Perform changes
-                        for change in pending_changes:
-                            #false_value = change % (package_id, 'false')
-                            false_value = change % (package_id, '**RESTRICTED**')
-                            true_value = change % (package_id, 'true')
-
-                            # Change specific configuration
-                            tmp_config = new_config[:]
-                            new_config = [w.replace(false_value, true_value) for w in new_config]
-
-                            #assert new_config != tmp_config
-                            if new_config == tmp_config:
-                                logger.error('Unable to restrict API %s, item not found in configuration file (%s)' % (true_value, apk))
-                                save_file = False
+                        save_file, new_config = ScenarioGenerator.__apply_changes(base_config, pending_changes, package_id, apk)
 
                         if save_file:
-                            # Remove all remaining **RESTRICTED**
-                            new_config = [w.replace('**RESTRICTED**', 'false') for w in new_config]
-
-                            # Write output file
-                            f = open(output_filename, 'w')
-                            f.writelines(new_config)
-                            f.close()
-
+                            ScenarioGenerator.__save_scenario_file(output_filename, new_config)
                     else:
                         logger.debug('API is not mockable (%s)', api)
             else:

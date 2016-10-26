@@ -1,6 +1,7 @@
 import time
 import logging
 import os
+from auxiliar import *
 from consts import ADB_EXPORT_COMMAND, ADB_INSTALL_COMMAND, ADB_PULL_COMMAND, ADB_UNINSTALL_COMMAND
 
 logger = logging.getLogger()
@@ -62,11 +63,7 @@ class XPrivacyConfigurationExtractor(object):
         logger.debug("Initializing XPrivacy's configuration extraction")
         logger.debug("Configuration files will be stored in %s", self.output_directory)
 
-        if not os.path.exists(self.output_directory):
-            os.mkdir(self.output_directory)
-
-        assert os.path.exists(self.output_directory)
-        assert os.path.isdir(self.output_directory)
+        mkdir(self.output_directory)
 
         for apk in apks:
             logger.info("Extracting configuration for APK %s", apk)

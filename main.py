@@ -12,6 +12,7 @@ from droidmate_executor import DroidmateExecutor
 from summary_processor import SummaryProcessor
 from scenario_generator import ScenarioGenerator
 from output_comparison import OutputComparison
+from auxiliar import *
 
 logger = logging.getLogger()
 
@@ -103,6 +104,49 @@ class Main(object):
         # Create the APK list
         self.__populate_apk_list(file_list)
 
+    def __extract_config(self, config_extraction_dir):
+        self.configurator_extractor.output_directory = config_extraction_dir
+        self.configurator_extractor.process(self.apks)
+
+    def __inline_apks(self, output_dir):
+        apk_inliner = ApkInliner()
+        apk_inliner.output_directory = output_dir
+        apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk-inliner"))
+        return apk_inliner.process(self.apks)
+
+    def __def_first_exploration(self, inlined_apk_dir, output_dir, tmp_dir, apk_mapping):
+        assert self.args.inline
+        droidmate_executor = DroidmateExecutor(inlined_apk_dir, output_dir, tmp_dir)
+        droidmate_executor.first_exploration(self.apks, apk_mapping)
+
+    def __extract_apis(self, exploration_dir):
+        summary_processor = SummaryProcessor()
+        processed_summaries = summary_processor.extract_apis(self.apks, exploration_dir)
+
+        # Print debug messages
+        for apk, log in processed_summaries:
+            logger.debug('Listing APIs for %s', apk)
+            for class_name, method_signature in log:
+                logger.debug('--%s->%s', class_name, method_signature)
+
+        summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, exploration_dir)
+
+        # Print debug messages
+        for apk, api_list, api_count in summarized_api_list_apk:
+            logger.debug('Summarized API list for %s', apk)
+            for method_signature, count in zip(api_list, api_count):
+                logger.debug('--%s\t%d', method_signature, count)
+
+        summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, exploration_dir)
+
+        # Print debug messages
+        logger.debug('Summarized API list')
+        summarized_api_name, summarized_api_count = summarized_api_list
+        for method_signature, count in zip(summarized_api_name, summarized_api_count):
+            logger.debug('--%s\t%d', method_signature, count)
+
+        return summarized_api_list_apk, summarized_api_list
+
     def process(self):
         logger.info("Processing APK(s)")
 
@@ -110,8 +154,7 @@ class Main(object):
         config_extraction_dir = os.path.join(args.tmpDir, 'extracted-config')
 
         if self.args.extractConfig:
-            self.configurator_extractor.output_directory = config_extraction_dir
-            self.configurator_extractor.process(self.apks)
+            self.__extract_config(config_extraction_dir)
         else:
             logger.info("Skipping 'Configuration extraction'")
 
@@ -119,78 +162,39 @@ class Main(object):
 
         # Inline APKs
         if self.args.inline:
-            apk_inliner = ApkInliner()
-            apk_inliner.output_directory = inlined_apk_dir
-            apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk-inliner"))
-            apk_mapping = apk_inliner.process(self.apks)
+            apk_mapping = self.__inline_apks(inlined_apk_dir)
         else:
             logger.info("Skipping 'Inline APKs'")
 
         executor_tmp_dir = os.path.join(self.args.tmpDir, 'processing')
         executor_output_dir = os.path.join(self.args.tmpDir, 'exploration')
 
-        if not os.path.exists(executor_output_dir):
-            os.mkdir(executor_output_dir)
-
-        assert os.path.exists(executor_output_dir)
-
+        mkdir(executor_output_dir)
         first_run_output_dir = os.path.join(executor_output_dir, 'first-run')
-
 
         # Run initial exploration
         if self.args.explore:
-            assert self.args.inline
-            droidmate_executor = DroidmateExecutor(inlined_apk_dir, first_run_output_dir, executor_tmp_dir)
-            droidmate_executor.first_exploration(self.apks, apk_mapping)
+            self.__def_first_exploration(inlined_apk_dir, first_run_output_dir, executor_tmp_dir)
         else:
             logger.info("Skipping 'Explore'")
 
         # Extract APIs
         if self.args.extractAPIs:
-            summary_processor = SummaryProcessor()
-            processed_summaries = summary_processor.extract_apis(self.apks, first_run_output_dir)
-
-            # Print debug messages
-            for apk, log in processed_summaries:
-                logger.debug('Listing APIs for %s', apk)
-                for class_name, method_signature in log:
-                    logger.debug('--%s->%s', class_name, method_signature)
-
-            summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, first_run_output_dir)
-
-            # Print debug messages
-            for apk, api_list, api_count in summarized_api_list_apk:
-                logger.debug('Summarized API list for %s', apk)
-                for method_signature, count in zip(api_list, api_count):
-                    logger.debug('--%s\t%d', method_signature, count)
-
-            summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, first_run_output_dir)
-
-            # Print debug messages
-            logger.debug('Summarized API list')
-            summarized_api_name, summarized_api_count = summarized_api_list
-            for method_signature, count in zip(summarized_api_name, summarized_api_count):
-                logger.debug('--%s\t%d', method_signature, count)
+            summarized_api_list_apk, summarized_api_list = self.__extract_apis(first_run_output_dir)
         else:
             logger.debug("Skipping 'Extract APIs'")
 
         scenario_output_dir = os.path.join(self.args.tmpDir, 'scenarios')
-        if not os.path.exists(scenario_output_dir):
-            os.mkdir(scenario_output_dir)
-        assert os.path.exists(scenario_output_dir)
+        mkdir(scenario_output_dir)
         api_blocked_1_scenario_output_dir = os.path.join(scenario_output_dir, '1-api-blocked')
 
         if self.args.generateScenarios:
-            if self.args.extractAPIs:
-                scenario_generator = ScenarioGenerator(config_extraction_dir, api_blocked_1_scenario_output_dir)
-                scenario_generator.generate_scenarios(summarized_api_list_apk)
-            else:
-                logger.error('It is not possible to generate scenarios without extracting APIs')
+            assert self.args.extractAPIs
+            scenario_generator = ScenarioGenerator(config_extraction_dir, api_blocked_1_scenario_output_dir)
+            scenario_generator.generate_scenarios_1_api_blocked(summarized_api_list_apk)
 
         api_blocked_1_output_dir = os.path.join(executor_output_dir, '1-api-blocked')
-
-        if not os.path.exists(api_blocked_1_output_dir):
-            os.mkdir(api_blocked_1_output_dir)
+        mkdir(api_blocked_1_output_dir)
 
         for apk in self.apks:
             # Run scenarios
