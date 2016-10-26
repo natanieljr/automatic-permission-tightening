@@ -1,6 +1,7 @@
 ### IntelliJ IDEA ###
 **/*.iws
 **/*.eml
+**/.idea/dictionaries/*
 **/.idea/workspace.xml
 **/.idea/tasks.xml
 **/.idea/misc.xml
@@ -16,4 +17,5 @@ out/
 /tmp/*
 /temp_extracted_resources
 /temp_extracted_resources/*
-data/apk/*
+data/*
+tmp*/*
