@@ -11,6 +11,7 @@ from apk_inliner import ApkInliner
 from droidmate_executor import DroidmateExecutor
 from summary_processor import SummaryProcessor
 from scenario_generator import ScenarioGenerator
+from output_comparison import OutputComparison
 
 logger = logging.getLogger()
 
@@ -133,12 +134,13 @@ class Main(object):
 
         assert os.path.exists(executor_output_dir)
 
-        executor_output_dir = os.path.join(executor_output_dir, 'first-run')
+        first_run_output_dir = os.path.join(executor_output_dir, 'first-run')
+
 
         # Run initial exploration
         if self.args.explore:
             assert self.args.inline
-            droidmate_executor = DroidmateExecutor(inlined_apk_dir, executor_output_dir, executor_tmp_dir)
+            droidmate_executor = DroidmateExecutor(inlined_apk_dir, first_run_output_dir, executor_tmp_dir)
             droidmate_executor.first_exploration(self.apks, apk_mapping)
         else:
             logger.info("Skipping 'Explore'")
@@ -146,7 +148,7 @@ class Main(object):
         # Extract APIs
         if self.args.extractAPIs:
             summary_processor = SummaryProcessor()
-            processed_summaries = summary_processor.extract_apis(self.apks, executor_output_dir)
+            processed_summaries = summary_processor.extract_apis(self.apks, first_run_output_dir)
 
             # Print debug messages
             for apk, log in processed_summaries:
@@ -154,7 +156,7 @@ class Main(object):
                 for class_name, method_signature in log:
                     logger.debug('--%s->%s', class_name, method_signature)
 
-            summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, executor_output_dir)
+            summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, first_run_output_dir)
 
             # Print debug messages
             for apk, api_list, api_count in summarized_api_list_apk:
@@ -162,7 +164,7 @@ class Main(object):
                 for method_signature, count in zip(api_list, api_count):
                     logger.debug('--%s\t%d', method_signature, count)
 
-            summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, executor_output_dir)
+            summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, first_run_output_dir)
 
             # Print debug messages
             logger.debug('Summarized API list')
@@ -172,38 +174,35 @@ class Main(object):
         else:
             logger.debug("Skipping 'Extract APIs'")
 
+        scenario_output_dir = os.path.join(self.args.tmpDir, 'scenarios')
+        if not os.path.exists(scenario_output_dir):
+            os.mkdir(scenario_output_dir)
+        assert os.path.exists(scenario_output_dir)
+        api_blocked_1_scenario_output_dir = os.path.join(scenario_output_dir, '1-api-blocked')
+
         if self.args.generateScenarios:
             if self.args.extractAPIs:
-                scenario_output_dir = os.path.join(self.args.tmpDir, 'scenarios')
-
-                if not os.path.exists(scenario_output_dir):
-                    os.mkdir(scenario_output_dir)
-
-                assert os.path.exists(scenario_output_dir)
-
-                scenario_output_dir = os.path.join(scenario_output_dir, '1-api-blocked')
-                scenario_generator = ScenarioGenerator(config_extraction_dir, scenario_output_dir)
+                scenario_generator = ScenarioGenerator(config_extraction_dir, api_blocked_1_scenario_output_dir)
                 scenario_generator.generate_scenarios(summarized_api_list_apk)
             else:
                 logger.error('It is not possible to generate scenarios without extracting APIs')
+
+        api_blocked_1_output_dir = os.path.join(executor_output_dir, '1-api-blocked')
+
+        if not os.path.exists(api_blocked_1_output_dir):
+            os.mkdir(api_blocked_1_output_dir)
 
         for apk in self.apks:
             # Run scenarios
             if self.args.runScenarios:
                 assert self.args.inline
-                assert self.args.generateScenarios
+                #assert self.args.generateScenarios
                 if apk_mapping.has_key(apk.get_basename()):
-                    executor_output_dir = os.path.dirname(executor_output_dir)
-                    executor_output_dir = os.path.join(executor_output_dir, '1-api-blocked')
-
-                    if not os.path.exists(executor_output_dir):
-                        os.mkdir(executor_output_dir)
-
-                    droidmate_executor = DroidmateExecutor(inlined_apk_dir, executor_output_dir, executor_tmp_dir)
-                    droidmate_executor.error_directory = os.path.join(executor_output_dir, 'fail')
+                    droidmate_executor = DroidmateExecutor(inlined_apk_dir, api_blocked_1_output_dir, executor_tmp_dir)
+                    droidmate_executor.error_directory = os.path.join(api_blocked_1_output_dir, 'fail')
 
                     # Locate the scenario files
-                    scenario_list = os.path.join(scenario_output_dir, apk.get_apk_name_as_directory_name())
+                    scenario_list = os.path.join(api_blocked_1_scenario_output_dir, apk.get_apk_name_as_directory_name())
                     if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
                         for scenario in os.listdir(scenario_list):
                             tmp = os.path.join(scenario_list, scenario)
@@ -211,6 +210,10 @@ class Main(object):
             else:
                 logger.info("Skipping 'Run Scenarios'")
 
+        if args.appCrashed:
+            # Use 'Application did not crash comparison'
+            output_comparer = OutputComparison(first_run_output_dir)
+            comparison_results = output_comparer.compare_results_using_apk_did_not_crash_strategy(api_blocked_1_output_dir, self.apks)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -278,6 +281,12 @@ if __name__ == "__main__":
                         help="Do not generate XPrivacy's configuration files for different scenarios")
     parser.set_defaults(runScenarios=True)
 
+    # Compare using 'App did not crash' metric
+    parser.add_argument(ARG_APP_CRASH, dest='appCrashed', action='store_true',
+                        help="Compare results using 'Application did not crash' metric")
+    parser.add_argument(ARG_APP_CRASH_NO, dest='appCrashed', action='store_false',
+                        help="Do not compare results using 'Application did not crash' metric")
+    parser.set_defaults(appCrashed=False)
 
     args = parser.parse_args()
 

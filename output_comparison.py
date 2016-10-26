@@ -5,10 +5,10 @@ logger = logging.getLogger()
 
 
 class OutputComparison(object):
-    base_exploration_dir = None
+    initial_exploration_dir = None
 
-    def __init__(self, base_exploration_dir):
-        self.base_exploration_dir = base_exploration_dir
+    def __init__(self, initial_exploration_dir):
+        self.initial_exploration_dir = initial_exploration_dir
 
     @staticmethod
     def execution_crashed(exploration_dir):
@@ -28,14 +28,28 @@ class OutputComparison(object):
         # Droidmate return
         return not 'N/A (lack of DeviceException)' in data[-1]
 
-    def compare_results_using_apk_did_not_crash_strategy(self, initial_exploration_dir, current_exploration_dir, apks):
+    @staticmethod
+    def __write_results_file(data, output_dir):
+        file_name = os.path.join(output_dir, 'app_crashed_comp_results.txt')
+        f = open(file_name, 'w')
+
+        for item in data:
+            s = ''
+            for t in item:
+                s += str(t) + '\t'
+            f.write(s + '\n')
+
+        f.close()
+
+    def compare_results_using_apk_did_not_crash_strategy(self, current_exploration_dir, apks):
         """
         Compare all exploration contained in a folder with their base explorations. Two explorations are considered
         equivalent if both did not crash
         :param initial_exploration_dir: Directory containing the results of the first exploration
         :param current_exploration_dir: Base directory containing all explorations to be evaluated
         :param apks: List of APKs that were explored
-        :return: List of APKs and equivalence information (APK [APKAdapter], scenario [String], equivalent [Boolean])
+        :return: List of APKs and equivalence information (APK [APKAdapter], scenario [String], first result, second
+        result, equivalent [Boolean])
         """
         result = []
 
@@ -45,7 +59,7 @@ class OutputComparison(object):
             apk_dir_name = apk.get_apk_name_as_directory_name()
 
             # The the initial exploration result
-            first_run_dir = os.path.join(initial_exploration_dir, apk_dir_name)
+            first_run_dir = os.path.join(self.initial_exploration_dir, apk_dir_name)
 
             if (not os.path.exists(first_run_dir)):
                 logger.error('Initial exploration missing for APK (%s)', apk)
@@ -63,6 +77,7 @@ class OutputComparison(object):
                         scenario_result = OutputComparison.execution_crashed(scenario_dir)
 
                         equivalent_results = (first_run_result == scenario_result)
-                        result.append([apk, scenario, equivalent_results])
+                        result.append([apk, scenario, first_run_result, scenario_result, equivalent_results])
 
+        OutputComparison.__write_results_file(result, current_exploration_dir)
         return result

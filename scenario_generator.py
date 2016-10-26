@@ -108,14 +108,15 @@ class ScenarioGenerator(object):
 
         if 'content://' in method_name:
             tmp = method_name.split("'")
-            method_name = tmp[0] + '__' + method_name[1]
+            method_name = tmp[0][:-1] + '[' + tmp[1] + ']'
         else:
             method_name = method_name.split("(")[0]
 
         api_call_as_file_name = class_name + "_" + method_name
-        api_call_as_file_name = api_call_as_file_name.replace("://", '___') \
-            .replace("://", '____') \
-            .replace("/", '_____')
+        api_call_as_file_name = api_call_as_file_name\
+            .replace("://", '_') \
+            .replace("://", '-') \
+            .replace("/", '-')
         """api_call_as_file_name = api_call_as_file_name.replace('->', '_') \
             .replace("('", '__') \
             .replace("://", '___') \
