@@ -41,7 +41,7 @@ class OutputComparison(object):
 
         f.close()
 
-    def compare_results_using_apk_did_not_crash_strategy(self, current_exploration_dir, apks):
+    def compare_with_apk_did_not_crash(self, current_exploration_dir, apks):
         """
         Compare all exploration contained in a folder with their base explorations. Two explorations are considered
         equivalent if both did not crash
@@ -77,7 +77,7 @@ class OutputComparison(object):
                         scenario_result = OutputComparison.execution_crashed(scenario_dir)
 
                         equivalent_results = (first_run_result == scenario_result)
-                        result.append([apk, scenario, first_run_result, scenario_result, equivalent_results])
+                        result.append([apk.get_apk_name_as_directory_name(), scenario, first_run_result, scenario_result, equivalent_results])
 
         OutputComparison.__write_results_file(result, current_exploration_dir)
         return result

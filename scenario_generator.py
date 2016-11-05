@@ -236,3 +236,84 @@ class ScenarioGenerator(object):
                         logger.debug('API is not mockable (%s)', api)
             else:
                 logger.error('Base XPrivacy configuration file not found for %s', apk)
+
+    @staticmethod
+    def __list_valid_scenarios_apk(comparison_results):
+        result = []
+
+        last_apk_dir = ''
+        for apk_dir, scenario_file, result_1, result_2, equivalent in comparison_results:
+            # If changed APK add a new list
+            if apk_dir != last_apk_dir:
+                result.append([apk_dir, []])
+                last_apk_dir = apk_dir
+
+            # If scenario is equivalent, add to the last list
+            if equivalent:
+                result[-1][1].append(scenario_file)
+
+        return result
+
+    @staticmethod
+    def __locate_restrictions(scenario_data):
+        result = []
+
+        for line in scenario_data:
+            if ('Restriction' in line) and ('Restricted="true"' in line):
+                result.append(line)
+
+        return result
+
+
+    def generate_scenarios_combined_api_blocked(self, original_scenario_dir, comparison_results,
+                                                process_scenario_names=False):
+        """
+        Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
+        :param original_scenario_dir: directory with the original scenario files
+        :param comparison_results: Comparison between the scenario and the initial exploration
+        :param process_scenario_names: Process scenario names to avoid repetition
+        :return: void
+        """
+        mkdir(self.output_directory)
+
+        valid_scenarios_apk = ScenarioGenerator.__list_valid_scenarios_apk(comparison_results)
+
+        no_changes = []
+
+        # For each application
+        for apk_dir, scenarios in valid_scenarios_apk:
+            # If exist more than 1 valid scenario
+            if len(scenarios) > 1:
+
+                for i in xrange(0, len(scenarios)):
+                    for j in xrange(i + 1, len(scenarios)):
+                        # Use scenario 1 as base
+                        scenario_1 = scenarios[i]
+                        scenario_1_path = os.path.join(original_scenario_dir, apk_dir, scenario_1)
+                        base_scenario_data = read_file(scenario_1_path)
+                        new_scenario_data = base_scenario_data[:]
+
+                        # Get scenario 2 restrictions
+                        scenario_2 = scenarios[j]
+                        scenario_2_path = os.path.join(original_scenario_dir, apk_dir, scenario_2)
+                        scenario_2_data = read_file(scenario_2_path)
+                        scenario_2_restrictions = ScenarioGenerator.__locate_restrictions(scenario_2_data)
+
+                        # Add restrictions from scenario 2 to scenario 1
+
+                        for restriction in scenario_2_restrictions:
+                            old_value = restriction.replace('Restricted="true"', 'Restricted="false"')
+                            new_scenario_data = [w.replace(old_value, restriction) for w in new_scenario_data]
+
+                        output_dir = self.output_directory
+                        if base_scenario_data == new_scenario_data:
+                            no_changes.append([apk_dir, scenario_1, scenario_2, str(i) + '-' + str(j) + '.xml'])
+                            output_dir = os.path.join(output_dir, 'unchanged')
+                            mkdir(output_dir)
+
+                        apk_scenario_output_dir = os.path.join(output_dir, apk_dir)
+                        mkdir(apk_scenario_output_dir)
+                        output_filename = os.path.join(apk_scenario_output_dir, str(i) + '-' + str(j) + '.xml')
+                        ScenarioGenerator.__save_scenario_file(output_filename, new_scenario_data)
+
+        return no_changes

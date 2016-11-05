@@ -25,11 +25,14 @@ ARG_RUN_SCENARIOS = '--runScenarios'
 ARG_RUN_SCENARIOS_NO = '--no-runScenarios'
 ARG_APP_CRASH = '--use-appCrashed'
 ARG_APP_CRASH_NO = '--no-use-appCrashed'
+ARG_RUN_SCENARIOS_COMP = '--runScenariosComp'
+ARG_RUN_SCENARIOS_COMP_NO = '--no-runScenariosComp'
+
 
 # ADB commands
-ADB_INSTALL_COMMAND = 'adb install %s'
-ADB_EXPORT_COMMAND = 'adb shell am start -a biz.bokhorst.xprivacy.action.EXPORT -e FileName /storage/emulated/0/.xprivacy/%s.xml'
-ADB_PULL_COMMAND = 'adb pull /storage/emulated/0/.xprivacy/%s.xml %s/%s.xml'
+ADB_INSTALL_COMMAND = "adb install %s"
+ADB_EXPORT_COMMAND = "adb shell am start -a biz.bokhorst.xprivacy.action.EXPORT -e FileName '/storage/emulated/0/.xprivacy/%s.xml'"
+ADB_PULL_COMMAND = "adb pull /storage/emulated/0/.xprivacy/%s.xml %s/%s.xml"
 ADB_UNINSTALL_COMMAND = 'adb uninstall %s'
 ADB_REBOOT_COMMAND = 'adb reboot'
 ADB_UNLOCK_SCREEN_COMMAND = 'adb shell input keyevent 82'

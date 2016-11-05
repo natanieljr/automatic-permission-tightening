@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+from shutil import copyfile
 import logging
 import argparse
 import os
@@ -21,6 +22,8 @@ class Main(object):
     """"
     Main application class, for mor information run the script with -h parameter
     """
+    dir_extracted_cfg = None
+
 
     args = None
     apks = []
@@ -62,9 +65,7 @@ class Main(object):
             logger.warn("Directory '%s' already exists, it will be deleter and recreated", directory)
             shutil.rmtree(directory)
 
-        os.mkdir(directory)
-        assert os.path.exists(directory)
-        assert os.path.isdir(directory)
+        mkdir(directory)
 
     def __populate_apk_list(self, file_list):
         """
@@ -174,7 +175,7 @@ class Main(object):
 
         # Run initial exploration
         if self.args.explore:
-            self.__def_first_exploration(inlined_apk_dir, first_run_output_dir, executor_tmp_dir)
+            self.__def_first_exploration(inlined_apk_dir, first_run_output_dir, executor_tmp_dir, apk_mapping)
         else:
             logger.info("Skipping 'Explore'")
 
@@ -217,7 +218,60 @@ class Main(object):
         if args.appCrashed:
             # Use 'Application did not crash comparison'
             output_comparer = OutputComparison(first_run_output_dir)
-            comparison_results = output_comparer.compare_results_using_apk_did_not_crash_strategy(api_blocked_1_output_dir, self.apks)
+            comparison_results = output_comparer.compare_with_apk_did_not_crash(api_blocked_1_output_dir, self.apks)
+
+        """
+        if args.runScenariosComposite:
+            assert args.appCrashed
+
+            api_blocked_2_scenario_output_dir = os.path.join(scenario_output_dir, '2-api-blocked')
+            mkdir(api_blocked_2_scenario_output_dir)
+
+            scenario_generator = ScenarioGenerator(config_extraction_dir, api_blocked_2_scenario_output_dir)
+            unchanged_scenarios = scenario_generator.generate_scenarios_combined_api_blocked(api_blocked_1_scenario_output_dir, comparison_results)
+            #for apk, scenario1, scenario2, new_scenario in unchanged_scenarios:
+
+            api_blocked_2_output_dir = os.path.join(executor_output_dir, '2-api-blocked')
+            mkdir(api_blocked_2_output_dir)
+
+            for apk in self.apks:
+                assert self.args.inline
+                # assert self.args.generateScenarios
+                if apk_mapping.has_key(apk.get_basename()):
+                    droidmate_executor = DroidmateExecutor(inlined_apk_dir, api_blocked_2_output_dir,
+                                                           executor_tmp_dir)
+                    droidmate_executor.error_directory = os.path.join(api_blocked_2_output_dir, 'fail')
+
+                    # Locate the scenario files
+                    scenario_list = os.path.join(api_blocked_2_scenario_output_dir,
+                                                 apk.get_apk_name_as_directory_name())
+                    if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
+                        for scenario in os.listdir(scenario_list):
+                            tmp = os.path.join(scenario_list, scenario)
+                            droidmate_executor.run_scenario(apk, apk_mapping, tmp)
+        """
+        api_blocked_2_scenario_output_dir = os.path.join(scenario_output_dir, '2-api-blocked')
+        mkdir(api_blocked_2_scenario_output_dir)
+
+        scenario_generator = ScenarioGenerator(config_extraction_dir, api_blocked_2_scenario_output_dir)
+        unchanged_scenarios = scenario_generator.generate_scenarios_combined_api_blocked(api_blocked_1_scenario_output_dir,
+                                                                                         comparison_results)
+
+    def _set_directories(self):
+        # Define the output directory for the extracted configuration files. Use application's temporary directory
+        self.dir_extracted_cfg = os.path.join(args.tmpDir, 'extracted-config')
+
+    """def new_process(self):
+        logger.info("(NEW) Processing APK(s)")
+
+        # Configure directy variables
+        self._set_directories()
+
+        if self.args.extractConfig:
+            self.__extract_config()
+        else:
+            logger.info("Skipping 'Configuration extraction'")"""
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -291,6 +345,13 @@ if __name__ == "__main__":
     parser.add_argument(ARG_APP_CRASH_NO, dest='appCrashed', action='store_false',
                         help="Do not compare results using 'Application did not crash' metric")
     parser.set_defaults(appCrashed=False)
+
+    # Run composite scenarios
+    parser.add_argument(ARG_RUN_SCENARIOS_COMP, dest='runScenariosComposite', action='store_true',
+                        help="Generate XPrivacy's configuration files for different, composite, scenarios and execute them")
+    parser.add_argument(ARG_RUN_SCENARIOS_COMP_NO, dest='runScenariosComposite', action='store_false',
+                        help="Do not generate XPrivacy's configuration files for different, composite, scenarios and execute them")
+    parser.set_defaults(runScenariosComposite=False)
 
     args = parser.parse_args()
 

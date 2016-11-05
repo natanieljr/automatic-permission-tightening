@@ -35,6 +35,13 @@ class APKAdapter(APK):
 
     def get_apk_name_as_directory_name(self):
         if self.package == "":
-            return self.filename.replace('.apk', '')
+            data = self.filename.replace('.apk', '')
+        else:
+            data = '%s_v%s' % (self.package, self.get_androidversion_name().replace('.', '_'))
 
-        return '%s_v%s' % (self.package, self.get_androidversion_name().replace('.', '_'))
+        if '(' in data:
+            start = data.index('(')
+            end = data.index(')')
+            data = data[:start - 1] + data[end + 1:]
+
+        return data

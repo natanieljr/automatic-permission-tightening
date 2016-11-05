@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import logging
 from shutil import copyfile
+from auxiliar import mkdir
 
 from consts import DROIDMATE_INLINE_APK
 
@@ -29,20 +30,17 @@ class ApkInliner(object):
         if os.path.exists(self.tmp_directory):
             shutil.rmtree(self.tmp_directory)
 
-        os.mkdir(self.tmp_directory)
-        os.mkdir(self.input_directory)
+        mkdir(self.tmp_directory)
+        mkdir(self.input_directory)
 
-        assert os.path.exists(self.input_directory)
-
-    @staticmethod
-    def __run_droidmate(directory):
+    def __run_droidmate(self):
         """
         Execute DroidMate with -inline command to inline all original APKs
         :param directory: Directory containing the original APKs
         :return:
         """
         command = DROIDMATE_INLINE_APK
-        command[-1] = command[-1] % directory
+        command[-1] = command[-1] % self.input_directory
         logging.debug("Executing DroidMate command: %s", command)
         signal = subprocess.call([command], shell=True)
         assert signal == 0
@@ -92,8 +90,7 @@ class ApkInliner(object):
         self.__copy_apks_to_tmp_folder(apks)
 
         # DroidMate's Inline command requires a directory
-        directory = self.input_directory
-        self.__run_droidmate(directory)
+        self.__run_droidmate()
 
         # Copy inlined APKs to output folder
         self.__copy_inlined_apks_to_output_folder()
