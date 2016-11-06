@@ -77,12 +77,28 @@ class ApkInliner(object):
                 dst = os.path.join(self.output_directory, f)
                 copyfile(src, dst)
 
+    def create_apk_mapping(self, apks):
+        """
+        Maps original APKs and inlined APKs
+        :param apks: List of APKs to be inlined
+        :return: Dictonary mapping each APK to an inlined APK
+        """
+        mapping = {}
+        for apk in apks:
+            file_name = apk.get_basename().replace('.apk', '-inlined.apk')
+            if os.path.exists(os.path.join(self.output_directory, file_name)):
+                mapping[apk.get_basename()] = file_name
+            else:
+                logger.warn("Unable to identify inlined version of apk %s", apk)
+
+        return mapping
+
     def process(self, apks):
         """
         Inline the list of APKs. This process is done by calling DroidMate internally with "-inline" argument.
         Moreover, all original APKs are copied to the working directory, therefore preventing changes int he original
         :param apks: List of APKs to be inlined
-        :return: Dictonary mapping each APK to an inlined APK
+        :return: Nothing
         """
         assert self.output_directory is not None
 
@@ -94,14 +110,3 @@ class ApkInliner(object):
 
         # Copy inlined APKs to output folder
         self.__copy_inlined_apks_to_output_folder()
-
-        # Map original APKs and inlined APKs
-        mapping = {}
-        for apk in apks:
-            file_name = apk.get_basename().replace('.apk', '-inlined.apk')
-            if os.path.exists(os.path.join(self.output_directory, file_name)):
-                mapping[apk.get_basename()] = file_name
-            else:
-                logger.warn("Unable to identify inlined version of apk %s", apk)
-
-        return mapping

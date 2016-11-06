@@ -4,65 +4,45 @@ from auxiliar import *
 logger = logging.getLogger()
 mapping = {
     "android.app.ActivityManager->getRunningTasks(int)":
-        [#'Name="system" Id="%d" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="system" Method="Srv_getTasks" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="system" Method="Srv_getTasks" Restricted="%s" Asked="false" />'],
     "android.app.ActivityManager->getRecentTasks(int,int)":
-        [#'Name="system" Id="%d" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="system" Method="Srv_getRecentTasks" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="system" Method="Srv_getRecentTasks" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://call_log/calls',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="calling" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="calling" Method="CallLogProvider" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="calling" Method="CallLogProvider" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/contacts',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/contacts/1/photo',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/contacts" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/data',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/data/postals',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/data/phones',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/data" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/profile',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/profile" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/profile" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://com.android.contacts/profile/photo',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="contacts" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="contacts" Method="contacts/profile" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="contacts" Method="contacts/profile" Restricted="%s" Asked="false" />'],
     "android.content.ContentResolver->query('content://sms',java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)":
-        [#'<Restriction Id="%d" Name="messages" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="messages" Method="SmsProvider" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="messages" Method="SmsProvider" Restricted="%s" Asked="false" />'],
     "android.hardware.Camera->open(int)":
-        [#'<Restriction Id="%d" Name="media" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="media" Method="Camera.permission" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="media" Method="Camera.permission" Restricted="%s" Asked="false" />'],
     "android.location.LocationManager->getBestProvider(android.location.Criteria,boolean)":
-        [#'<Restriction Id="%d" Name="location" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="location" Method="Srv_getBestProvider" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="location" Method="Srv_getBestProvider" Restricted="%s" Asked="false" />'],
     "android.location.LocationManager->getLastKnownLocation(java.lang.String)":
-        [#'<Restriction Id="%d" Name="location" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="location" Method="Srv_getLastLocation" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="location" Method="Srv_getLastLocation" Restricted="%s" Asked="false" />'],
     "android.location.LocationManager->getProviders(boolean)":
-        [#'<Restriction Id="%d" Name="location" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="location" Method="Srv_getProviders" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="location" Method="Srv_getProviders" Restricted="%s" Asked="false" />'],
     "android.location.LocationManager->isProviderEnabled(java.lang.String)":
-        [#'<Restriction Id="%d" Name="location" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="location" Method="Srv_isProviderEnabled" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="location" Method="Srv_isProviderEnabled" Restricted="%s" Asked="false" />'],
     "android.telephony.TelephonyManager->getDeviceId()":
-        [#'<Restriction Id="%d" Name="phone" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="phone" Method="Srv_getDeviceId5" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="phone" Method="Srv_getDeviceId5" Restricted="%s" Asked="false" />'],
     "java.net.Socket->connect(java.net.SocketAddress,int)":
-        [#'<Restriction Id="%d" Name="internet" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />'],
     "java.net.URL->openConnection()":
-        [#'<Restriction Id="%d" Name="internet" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />'],
+        ['<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />'],
     "org.apache.http.impl.client.AbstractHttpClient->execute(org.apache.http.HttpHost,org.apache.http.HttpRequest,org.apache.http.protocol.HttpContext)":
-        [#'<Restriction Id="%d" Name="internet" Restricted="%s" Asked="false" />',
-         '<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />']
+        ['<Restriction Id="%d" Name="internet" Method="inet" Restricted="%s" Asked="false" />']
     }
 
 
@@ -70,7 +50,6 @@ class ScenarioGenerator(object):
     """
     Class that generate execution scenarios based on the identified API list
     """
-
     config_directory = None
     output_directory = None
 
@@ -82,7 +61,7 @@ class ScenarioGenerator(object):
         """
         self.config_directory = config_directory
         self.output_directory = output_directory
-
+    '''
     def __get_filename(self, apk_directory, api):
         """
         Create a file name to a scenario based on the API that is being restricted
@@ -114,7 +93,7 @@ class ScenarioGenerator(object):
         filename = os.path.join(apk_directory, api_call_as_file_name) + '.xml'
 
         return filename
-
+    '''
     @staticmethod
     def __get_package_id(config, apk):
         """
@@ -200,13 +179,26 @@ class ScenarioGenerator(object):
 
         return save_file, config
 
+    def __write_mapping(self, scenario_mapping):
+        # Write output file
+        data = ''
+        for w in scenario_mapping:
+            data += '%s\t%s\t%s\n' % (w[0], w[1], w[2])
+
+        output_file = os.path.join(self.output_directory, 'mapping.txt')
+        f = open(output_file, 'w')
+        f.writelines(data)
+        f.close()
+
     def generate_scenarios_1_api_blocked(self, summarized_api_list_apk):
         """
         Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
         :param summarized_api_list_apk: List of API calls per APK
-        :return: void
+        :return: scenario file mapping
         """
         mkdir(self.output_directory)
+
+        scenario_mapping = []
 
         for apk, api_list, api_count in summarized_api_list_apk:
             logger.info('Generating scenarios for %s', apk)
@@ -218,11 +210,15 @@ class ScenarioGenerator(object):
             if os.path.exists(base_config_path):
                 package_id, base_config = ScenarioGenerator.__read_configuration_file(base_config_path, apk)
 
+                scenario_id = 0
+
                 for api, count in zip(api_list, api_count):
                     logger.debug('API found %s (%d)', api, count)
-                    # Check is is mapped
+                    # Check if it's mapped
                     if api in mapping.keys():
-                        output_filename = self.__get_filename(apk_directory, api)
+                        output_filename = os.path.join(apk_directory, str(scenario_id)) + '.xml'
+                        scenario_id += 1
+                        #output_filename = self.__get_filename(apk_directory, api)
                         logger.info('API is mockable, generating scenario (%s)', output_filename)
 
                         pending_changes = mapping[api]
@@ -231,11 +227,17 @@ class ScenarioGenerator(object):
                         save_file, new_config = ScenarioGenerator.__apply_changes(base_config, pending_changes, package_id, apk)
 
                         if save_file:
+                            apk_name = apk.get_apk_name_as_directory_name()
+                            scenario_mapping.append([apk_name, api, scenario_id])
                             ScenarioGenerator.__save_scenario_file(output_filename, new_config)
                     else:
                         logger.debug('API is not mockable (%s)', api)
             else:
                 logger.error('Base XPrivacy configuration file not found for %s', apk)
+
+        self.__write_mapping(scenario_mapping)
+
+        return scenario_mapping
 
     @staticmethod
     def __list_valid_scenarios_apk(comparison_results):
@@ -264,9 +266,8 @@ class ScenarioGenerator(object):
 
         return result
 
-
     def generate_scenarios_combined_api_blocked(self, original_scenario_dir, comparison_results,
-                                                process_scenario_names=False):
+                                                memory):
         """
         Generate scenarios with a single API being restricted. Each scenario will be saved in a configuration file
         :param original_scenario_dir: directory with the original scenario files
@@ -306,14 +307,21 @@ class ScenarioGenerator(object):
                             new_scenario_data = [w.replace(old_value, restriction) for w in new_scenario_data]
 
                         output_dir = self.output_directory
-                        if base_scenario_data == new_scenario_data:
+                        if (base_scenario_data == new_scenario_data) or \
+                                (new_scenario_data in memory):
                             no_changes.append([apk_dir, scenario_1, scenario_2, str(i) + '-' + str(j) + '.xml'])
                             output_dir = os.path.join(output_dir, 'unchanged')
                             mkdir(output_dir)
+                        else:
+                            memory.append(new_scenario_data)
 
                         apk_scenario_output_dir = os.path.join(output_dir, apk_dir)
                         mkdir(apk_scenario_output_dir)
                         output_filename = os.path.join(apk_scenario_output_dir, str(i) + '-' + str(j) + '.xml')
+                        #if 'unchanged' in output_filename:
+                        #    f = open('C:/Users/natan_000/Desktop/aaa.txt', 'w')
+                        #    f.writelines(new_scenario_data)
+                        #    f.close()
                         ScenarioGenerator.__save_scenario_file(output_filename, new_scenario_data)
 
         return no_changes

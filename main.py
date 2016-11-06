@@ -23,12 +23,17 @@ class Main(object):
     Main application class, for mor information run the script with -h parameter
     """
     dir_extracted_cfg = None
+    dir_inlined_apk = None
+    dir_exploration_base = None
+    dir_exploration_tmp = None
+    dir_exploration_first = None
+    dir_scenario_base = None
 
-
+    memory = None
     args = None
     apks = []
 
-    def __init__(self, arguments, configurator_extractor=XPrivacyConfigurationExtractor()):
+    def __init__(self, arguments):
         """
         Create a new instance of the application
         :param arguments: Command line arguments
@@ -36,17 +41,8 @@ class Main(object):
         logger.info("Initializing application")
         logger.debug("Work directory: %s", os.getcwd())
         self.args = arguments
-        self.configurator_extractor = configurator_extractor
         self.__validate()
         self.__initialize()
-
-    def get_inlined_apk_dir(self):
-        """
-        Return the directory where inlined APKs should be stored. This directory is a subdirectory of the temporary
-        directory
-        :return: Inlined APKs directory
-        """
-        return os.path.join(self.args.tmpDir, "inlined")
 
     def get_original_apk_dir(self):
         if args.apk is not None:
@@ -104,49 +100,6 @@ class Main(object):
 
         # Create the APK list
         self.__populate_apk_list(file_list)
-
-    def __extract_config(self, config_extraction_dir):
-        self.configurator_extractor.output_directory = config_extraction_dir
-        self.configurator_extractor.process(self.apks)
-
-    def __inline_apks(self, output_dir):
-        apk_inliner = ApkInliner()
-        apk_inliner.output_directory = output_dir
-        apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk-inliner"))
-        return apk_inliner.process(self.apks)
-
-    def __def_first_exploration(self, inlined_apk_dir, output_dir, tmp_dir, apk_mapping):
-        assert self.args.inline
-        droidmate_executor = DroidmateExecutor(inlined_apk_dir, output_dir, tmp_dir)
-        droidmate_executor.first_exploration(self.apks, apk_mapping)
-
-    def __extract_apis(self, exploration_dir):
-        summary_processor = SummaryProcessor()
-        processed_summaries = summary_processor.extract_apis(self.apks, exploration_dir)
-
-        # Print debug messages
-        for apk, log in processed_summaries:
-            logger.debug('Listing APIs for %s', apk)
-            for class_name, method_signature in log:
-                logger.debug('--%s->%s', class_name, method_signature)
-
-        summarized_api_list_apk = summary_processor.count_api_calls_per_apk(processed_summaries, exploration_dir)
-
-        # Print debug messages
-        for apk, api_list, api_count in summarized_api_list_apk:
-            logger.debug('Summarized API list for %s', apk)
-            for method_signature, count in zip(api_list, api_count):
-                logger.debug('--%s\t%d', method_signature, count)
-
-        summarized_api_list = summary_processor.count_api_calls(summarized_api_list_apk, exploration_dir)
-
-        # Print debug messages
-        logger.debug('Summarized API list')
-        summarized_api_name, summarized_api_count = summarized_api_list
-        for method_signature, count in zip(summarized_api_name, summarized_api_count):
-            logger.debug('--%s\t%d', method_signature, count)
-
-        return summarized_api_list_apk, summarized_api_list
 
     def process(self):
         logger.info("Processing APK(s)")
@@ -257,20 +210,255 @@ class Main(object):
         unchanged_scenarios = scenario_generator.generate_scenarios_combined_api_blocked(api_blocked_1_scenario_output_dir,
                                                                                          comparison_results)
 
+    #############
+    #############
+    #############
+    #############
+    #############
+    #############
     def _set_directories(self):
         # Define the output directory for the extracted configuration files. Use application's temporary directory
         self.dir_extracted_cfg = os.path.join(args.tmpDir, 'extracted-config')
+        self.dir_inlined_apk = os.path.join(self.args.tmpDir, "inlined")
+        self.dir_exploration_base = os.path.join(self.args.tmpDir, 'exploration')
+        self.dir_exploration_tmp = os.path.join(self.args.tmpDir, 'processing')
+        self.dir_exploration_first = os.path.join(self.dir_exploration_base, 'first-run')
+        self.dir_exploration_1api = os.path.join(self.dir_exploration_base, '1-api-blocked')
+        self.dir_scenario_base = os.path.join(self.args.tmpDir, 'scenarios')
+        self.dir_scenario_1api = os.path.join(self.dir_scenario_base, '1-api-blocked')
 
-    """def new_process(self):
+        mkdir(self.dir_extracted_cfg)
+        mkdir(self.dir_inlined_apk)
+        mkdir(self.dir_exploration_base)
+        mkdir(self.dir_exploration_tmp)
+        mkdir(self.dir_exploration_first)
+        mkdir(self.dir_scenario_base)
+        mkdir(self.dir_scenario_1api)
+        mkdir(self.dir_exploration_1api)
+
+    def __extract_config(self):
+        if self.args.extractConfig:
+            cfg_extractor = XPrivacyConfigurationExtractor()
+            cfg_extractor.output_directory = self.dir_extracted_cfg
+            cfg_extractor.process(self.apks)
+        else:
+            logger.info("Skipping 'Configuration extraction'")
+
+    def __inline_apks(self):
+        apk_inliner = ApkInliner()
+        apk_inliner.output_directory = self.dir_inlined_apk
+        if self.args.inline:
+            apk_inliner.set_tmp_directory(os.path.join(self.args.tmpDir, "apk-inliner"))
+            apk_mapping = apk_inliner.process(self.apks)
+        else:
+            logger.info("Skipping 'Inline APKs'")
+
+        # If the output directory exists, create the mapping
+        if os.path.exists(self.dir_inlined_apk):
+            logger.info("Creating mapping from output directory")
+            # Map original APKs and inlined APKs
+            apk_mapping = apk_inliner.create_apk_mapping(self.apks)
+
+            return apk_mapping
+
+        return {}
+
+    def __first_exploration(self, inlined_apks):
+        # Run initial exploration
+        if self.args.explore:
+            executor = DroidmateExecutor(self.dir_inlined_apk, self.dir_exploration_first, self.dir_exploration_tmp)
+            executor.first_exploration(self.apks, inlined_apks)
+        else:
+            logger.info("Skipping 'Initial exploration'")
+
+    def __extract_apis(self, exploration_dir):
+        if self.args.extractAPIs:
+            processor = SummaryProcessor()
+            raw_api_list = processor.extract_apis(self.apks, exploration_dir)
+            api_list_apk = processor.count_api_calls_per_apk(raw_api_list, exploration_dir)
+            api_list = processor.count_api_calls(api_list_apk, exploration_dir)
+
+            # Print RAW api calls
+            for apk, log in raw_api_list:
+                logger.debug('Listing APIs for %s', apk)
+                for class_name, method in log:
+                    logger.debug('--%s->%s', class_name, method)
+
+            # Print debug messages
+            for apk, methods, count in api_list_apk:
+                logger.debug('Summarized API list for %s', apk)
+                for method, value in zip(methods, count):
+                    logger.debug('--%s\t%d', method, value)
+
+            # Print debug messages
+            logger.debug('Summarized API list')
+            methods, values = api_list
+            for method, value in zip(methods, values):
+                logger.debug('--%s\t%d', method, value)
+        else:
+            logger.debug("Skipping 'Extract APIs'")
+            api_list_apk = []
+            api_list = []
+
+        return  api_list_apk, api_list
+
+    def __generate_scenarios_1api(self, api_list_apk):
+        scenario_mapping = []
+        if self.args.generateScenarios:
+            scenario_generator = ScenarioGenerator(self.dir_extracted_cfg, self.dir_scenario_1api)
+            scenario_mapping = scenario_generator.generate_scenarios_1_api_blocked(api_list_apk)
+        else:
+            logger.debug("Skipping 'Generate scenarios (1 API)'")
+
+            file_name = os.path.join(self.dir_scenario_1api, 'mapping.txt')
+            # If the output directory exists, create the mapping
+            if os.path.exists(file_name):
+                logger.info("Creating scenario mapping from file")
+                f = open(file_name)
+                data = f.readlines()
+                f.close()
+
+                for line in data:
+                    tmp = line.strip().split('\t')
+                    scenario_mapping.append(tmp)
+
+        return scenario_mapping
+
+    def __run_scenarios(self, inlined_apks):
+        for apk in self.apks:
+            key = apk.get_basename()
+            if inlined_apks.has_key(key):
+                executor = DroidmateExecutor(self.dir_inlined_apk, self.dir_exploration_1api, self.dir_exploration_tmp)
+
+                # Locate the scenario files
+                dir_apk = apk.get_apk_name_as_directory_name()
+                scenario_list = os.path.join(self.dir_scenario_1api, dir_apk)
+                if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
+                    # For each scenario, execute
+                    for scenario in os.listdir(scenario_list):
+                        scenario_path = os.path.join(scenario_list, scenario)
+                        executor.run_scenario(apk, inlined_apks, scenario_path)
+
+    def __compare_executions(self, exploration):
+        evaluator = OutputComparison(self.dir_exploration_first)
+
+        results = []
+        if args.appCrashed:
+            # Use 'Application did not crash comparison'
+            results = evaluator.compare_with_apk_did_not_crash(exploration, self.apks)
+        else:
+            file_name = os.path.join(exploration, 'app_crashed_comp_results.txt')
+
+            if os.path.exists(file_name):
+                logger.info('Reading evaluation results from file')
+                f = open(file_name)
+                data = f.readlines()
+                f.close()
+
+                results = []
+                for line in data:
+                    tmp = line.strip().split('\t')
+                    tmp[2] = bool(tmp[2])
+                    tmp[3] = bool(tmp[3])
+                    tmp[4] = bool(tmp[4])
+
+                    results.append(tmp)
+
+        return results
+
+    def __combine_scenarios_and_run(self, initial_comparison, inlined_apks):
+        if args.runScenariosComposite:
+            old_scenario_dir = self.dir_scenario_1api
+            nr_apis = 2
+
+            equivalents = [w for w in initial_comparison if w[4]]
+            while len(equivalents) > 0:
+                scenario_dir = os.path.join(self.dir_scenario_base, '%d-api-blocked' % nr_apis)
+                mkdir(scenario_dir)
+
+                generator = ScenarioGenerator(self.dir_extracted_cfg, scenario_dir)
+                unchanged = generator.generate_scenarios_combined_api_blocked(old_scenario_dir, equivalents, self.memory)
+                #extra_mem_data = Main.__read_scenarios(scenario_dir)
+                #self.memory += extra_mem_data
+
+                # for apk, scenario1, scenario2, new_scenario in unchanged_scenarios:
+
+                exploration_dir = os.path.join(self.dir_exploration_base, '%d-api-blocked' % nr_apis)
+                mkdir(exploration_dir)
+
+                for apk in self.apks:
+                    if inlined_apks.has_key(apk.get_basename()):
+                        executor = DroidmateExecutor(self.dir_inlined_apk, exploration_dir, self.dir_exploration_tmp)
+                        executor.error_directory = os.path.join(exploration_dir, 'fail')
+
+                        # Locate the scenario files
+                        apk_dir = apk.get_apk_name_as_directory_name()
+                        scenario_list = os.path.join(scenario_dir, apk_dir)
+                        if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
+                            for scenario in os.listdir(scenario_list):
+                                scenario_file = os.path.join(scenario_list, scenario)
+                                #if nr_apis > 2:
+                                executor.run_scenario(apk, inlined_apks, scenario_file)
+
+                ###########
+                comparison = self.__compare_executions(exploration_dir)
+                equivalents = [w for w in comparison if w[4]]
+
+                old_scenario_dir = scenario_dir
+                nr_apis *= 2
+
+    @staticmethod
+    def __read_scenarios(scenario_dir):
+        data = []
+
+        if os.path.exists(scenario_dir) and os.path.isdir(scenario_dir):
+            for apk in os.listdir(scenario_dir):
+                apk_dir = os.path.join(scenario_dir, apk)
+                if os.path.isdir(apk_dir):
+                    for scenario in os.listdir(apk_dir):
+                        scenario_file = os.path.join(apk_dir, scenario)
+                        if os.path.isfile(scenario_file):
+                            f = open(scenario_file)
+                            tmp = f.readlines()
+                            f.close()
+
+                            data.append(tmp)
+
+        return data
+
+    def new_process(self):
         logger.info("(NEW) Processing APK(s)")
 
-        # Configure directy variables
+        # Configure directy's variables
         self._set_directories()
 
-        if self.args.extractConfig:
-            self.__extract_config()
+        # Extract configuration (if necessary)
+        self.__extract_config()
+
+        # Inline APKs (if necessary)
+        inlined_apks = self.__inline_apks()
+
+        # Execute first exploration (if necessary)
+        self.__first_exploration(inlined_apks)
+
+        # Extract APIs (if necessary)
+        api_list_apk, api_list = self.__extract_apis(self.dir_exploration_first)
+
+        # Generate individual scenarios (if necessary)
+        #scenario_mapping = self.__generate_scenarios_1api(api_list_apk)
+        self.__generate_scenarios_1api(api_list_apk)
+
+        self.memory = Main.__read_scenarios(self.dir_scenario_1api)
+
+        # Run scenarios
+        if self.args.runScenarios:
+            self.__run_scenarios(inlined_apks)
         else:
-            logger.info("Skipping 'Configuration extraction'")"""
+            logger.info("Skipping 'Run Scenarios'")
+
+        comparison = self.__compare_executions(self.dir_exploration_1api)
+
+        self.__combine_scenarios_and_run(comparison, inlined_apks)
 
 
 if __name__ == "__main__":
@@ -302,42 +490,42 @@ if __name__ == "__main__":
                         help="Execute 'Extract XPrivacy's configuration files' process")
     parser.add_argument(ARG_CFG_NO, dest='extractConfig', action='store_false',
                         help="Do not execute 'Extract XPrivacy's configuration files' process")
-    parser.set_defaults(extractConfig=True)
+    parser.set_defaults(extractConfig=False)
 
     # Inline
     parser.add_argument(ARG_INLINE, dest='inline', action='store_true',
                         help="Execute 'Inline APKs' process")
     parser.add_argument(ARG_INLINE_NO, dest='inline', action='store_false',
                         help="Do not execute 'Inline APKs' process")
-    parser.set_defaults(inline=True)
+    parser.set_defaults(inline=False)
 
     # Run initial exploration
     parser.add_argument(ARG_EXPLORE, dest='explore', action='store_true',
                         help="Execute 'Run initial exploration' process")
     parser.add_argument(ARG_EXPLORE_NO, dest='explore', action='store_false',
                         help="Do not execute 'Run initial exploration' process")
-    parser.set_defaults(explore=True)
+    parser.set_defaults(explore=False)
 
     # Extract APIs from summary
     parser.add_argument(ARG_EXTRACT_APIS, dest='extractAPIs', action='store_true',
                         help="Execute 'Extract API list' process")
     parser.add_argument(ARG_EXTRACT_APIS_NO, dest='extractAPIs', action='store_false',
                         help="Do not execute 'Extract API list' process")
-    parser.set_defaults(extractAPIs=True)
+    parser.set_defaults(extractAPIs=False)
 
     # Generate scenarios
     parser.add_argument(ARG_GENERATE_SCENARIOS, dest='generateScenarios', action='store_true',
                         help="Generate XPrivacy's configuration files for different scenarios")
     parser.add_argument(ARG_GENERATE_SCENARIOS_NO, dest='generateScenarios', action='store_false',
                         help="Do not generate XPrivacy's configuration files for different scenarios")
-    parser.set_defaults(generateScenarios=True)
+    parser.set_defaults(generateScenarios=False)
 
     # Run scenarios
     parser.add_argument(ARG_RUN_SCENARIOS, dest='runScenarios', action='store_true',
                         help="Generate XPrivacy's configuration files for different scenarios")
     parser.add_argument(ARG_RUN_SCENARIOS_NO, dest='runScenarios', action='store_false',
                         help="Do not generate XPrivacy's configuration files for different scenarios")
-    parser.set_defaults(runScenarios=True)
+    parser.set_defaults(runScenarios=False)
 
     # Compare using 'App did not crash' metric
     parser.add_argument(ARG_APP_CRASH, dest='appCrashed', action='store_true',
@@ -358,4 +546,4 @@ if __name__ == "__main__":
     fileConfig('logging_config.ini')
 
     main = Main(args)
-    main.process()
+    main.new_process()
