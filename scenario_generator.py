@@ -217,7 +217,6 @@ class ScenarioGenerator(object):
                     # Check if it's mapped
                     if api in mapping.keys():
                         output_filename = os.path.join(apk_directory, str(scenario_id)) + '.xml'
-                        scenario_id += 1
                         #output_filename = self.__get_filename(apk_directory, api)
                         logger.info('API is mockable, generating scenario (%s)', output_filename)
 
@@ -230,6 +229,7 @@ class ScenarioGenerator(object):
                             apk_name = apk.get_apk_name_as_directory_name()
                             scenario_mapping.append([apk_name, api, scenario_id])
                             ScenarioGenerator.__save_scenario_file(output_filename, new_config)
+                        scenario_id += 1
                     else:
                         logger.debug('API is not mockable (%s)', api)
             else:

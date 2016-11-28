@@ -25,6 +25,8 @@ ARG_RUN_SCENARIOS = '--runScenarios'
 ARG_RUN_SCENARIOS_NO = '--no-runScenarios'
 ARG_APP_CRASH = '--use-appCrashed'
 ARG_APP_CRASH_NO = '--no-use-appCrashed'
+ARG_OBS_EXPL = '--use-obsExpl'
+ARG_OBS_EXPL_NO = '--no-use-obsExpl'
 ARG_RUN_SCENARIOS_COMP = '--runScenariosComp'
 ARG_RUN_SCENARIOS_COMP_NO = '--no-runScenariosComp'
 

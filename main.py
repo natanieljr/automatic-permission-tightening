@@ -346,6 +346,8 @@ class Main(object):
         if args.appCrashed:
             # Use 'Application did not crash comparison'
             results = evaluator.compare_with_apk_did_not_crash(exploration, self.apks)
+        elif args.obsExpl:
+            results = evaluator.compare_with_number_of_widgets_observed_explored(exploration, self.apks)
         else:
             file_name = os.path.join(exploration, 'app_crashed_comp_results.txt')
 
@@ -397,7 +399,6 @@ class Main(object):
                         if os.path.exists(scenario_list) and os.path.isdir(scenario_list):
                             for scenario in os.listdir(scenario_list):
                                 scenario_file = os.path.join(scenario_list, scenario)
-                                #if nr_apis > 2:
                                 executor.run_scenario(apk, inlined_apks, scenario_file)
 
                 ###########
@@ -533,6 +534,14 @@ if __name__ == "__main__":
     parser.add_argument(ARG_APP_CRASH_NO, dest='appCrashed', action='store_false',
                         help="Do not compare results using 'Application did not crash' metric")
     parser.set_defaults(appCrashed=False)
+
+    # Compare using 'Seen/Observed' metric
+    parser.add_argument(ARG_OBS_EXPL, dest='obsExpl', action='store_true',
+                        help="Compare results using 'Number of widgets observed/explored' metric")
+    parser.add_argument(ARG_OBS_EXPL_NO, dest='obsExpl', action='store_false',
+                        help="Do not compare results using 'Number of widgets observed/explored' metric")
+    parser.set_defaults(obsExpl=False)
+
 
     # Run composite scenarios
     parser.add_argument(ARG_RUN_SCENARIOS_COMP, dest='runScenariosComposite', action='store_true',
