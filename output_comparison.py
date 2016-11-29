@@ -97,9 +97,11 @@ class OutputComparison(object):
         """
         Compare all exploration contained in a folder with their base explorations. Two explorations are considered
         equivalent if both did not crash
-        :param initial_exploration_dir: Directory containing the results of the first exploration
         :param current_exploration_dir: Base directory containing all explorations to be evaluated
         :param apks: List of APKs that were explored
+        :param evaluation_method: Pointer to the method that will be used to evalute an exploration
+        :param comparison_method: Ponter to the method that will be used to compare two explorations
+        :param output_file_name: Name of the output file
         :return: List of APKs and equivalence information (APK [APKAdapter], scenario [String], first result, second
         result, equivalent [Boolean])
         """
@@ -112,6 +114,8 @@ class OutputComparison(object):
 
             # The the initial exploration result
             first_run_dir = os.path.join(self.initial_exploration_dir, apk_dir_name)
+            #first_run_dir = os.path.join('C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\exploration\\first-run', apk_dir_name)
+            #current_exploration_dir = 'C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\app_did_not_crash\\exploration\\8-api-blocked'
 
             if not os.path.exists(first_run_dir):
                 logger.error('Initial exploration missing for APK (%s)', apk)
@@ -139,7 +143,6 @@ class OutputComparison(object):
         """
         Compare all exploration contained in a folder with their base explorations. Two explorations are considered
         equivalent if both did not crash
-        :param initial_exploration_dir: Directory containing the results of the first exploration
         :param current_exploration_dir: Base directory containing all explorations to be evaluated
         :param apks: List of APKs that were explored
         :return: List of APKs and equivalence information (APK [APKAdapter], scenario [String], first result, second
@@ -153,7 +156,6 @@ class OutputComparison(object):
         """
         Compare all exploration contained in a folder with their base explorations. Two explorations are considered
         equivalent if they saw a similar (5% variation) number of widgets
-        :param initial_exploration_dir: Directory containing the results of the first exploration
         :param current_exploration_dir: Base directory containing all explorations to be evaluated
         :param apks: List of APKs that were explored
         :return: List of APKs and equivalence information (APK [APKAdapter], scenario [String], first result, second
