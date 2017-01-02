@@ -61,6 +61,12 @@ class DroidmateExecutor(object):
         move(src, dst)
         assert os.path.exists(result_directory)
 
+        for f in os.listdir('.'):
+            if f.startswith('action') or f.startswith('windowHierarchyDump'):
+                src = f
+                dst = os.path.join(result_directory, f)
+                move(src, dst)
+
     def __copy_results_to_fail(self, apk, scenario=None):
         """
         Copy exploration results to output directory

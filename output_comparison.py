@@ -114,8 +114,8 @@ class OutputComparison(object):
 
             # The the initial exploration result
             first_run_dir = os.path.join(self.initial_exploration_dir, apk_dir_name)
-            #first_run_dir = os.path.join('C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\exploration\\first-run', apk_dir_name)
-            #current_exploration_dir = 'C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\app_did_not_crash\\exploration\\8-api-blocked'
+            first_run_dir = os.path.join('C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\exploration\\first-run', apk_dir_name)
+            current_exploration_dir = 'C:\\Users\\natan_000\\Desktop\\Saarland\\repositories\\automatic-permission-tightening\\data\\obs_expl\\0.20\exploration\\4-api-blocked'
 
             if not os.path.exists(first_run_dir):
                 logger.error('Initial exploration missing for APK (%s)', apk)

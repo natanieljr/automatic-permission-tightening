@@ -32,7 +32,8 @@ sensitive_apis_mapping = mp.keys()
 
 fileConfig('logging_config.ini')
 result = []
-d = 'data/app_did_not_crash/scenarios/'
+#d = 'data/app_did_not_crash/scenarios/'
+d = 'data/obs_expl/0.50/scenarios/'
 for f in os.listdir(d):
     logger.info('Processing results in directory %s' % f)
     fn = os.path.join(os.path.join(d, f))
