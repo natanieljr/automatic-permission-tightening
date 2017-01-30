@@ -1,8 +1,82 @@
 from logging.config import fileConfig
 import logging
 import os
+import threading
+from math import sqrt
 from auxiliar import read_file
 from scenario_generator import mapping as mp
+
+
+class ExplorationResult(object):
+    threshold = None,
+    scenario = None,
+    size = None,
+    app = None,
+    scenario = None
+    initial_expl_observed = 0
+    initial_expl_explored = 0
+    scenario_observed = 0
+    scenario_explored = 0
+    result005 = None
+    result010 = None
+    result015 = None
+    result020 = None
+    result030 = None
+    result040 = None
+    result050 = None
+    API_calls_total = 0
+    API_calls_blocked = 0
+    uniq_API_calls_total = 0
+    uniq_API_calls_blocked = 0
+    APIs = []
+    exception = ''
+
+    def uniq_API_calls_perc(self):
+        if self.uniq_API_calls_total != 0:
+            return self.uniq_API_calls_blocked / float(self.uniq_API_calls_total)
+        else:
+            return 0.0
+
+    def API_calls_perc(self):
+        if self.API_calls_total != 0:
+            return self.API_calls_blocked / float(self.API_calls_total)
+        else:
+            return 0.0
+
+    def qtd_APIs(self):
+        return len(self.APIs)
+
+    def get_dists(self):
+        dist1 = sqrt(pow(self.initial_expl_observed, 2) + pow(self.initial_expl_explored, 2))
+        dist2 = sqrt(pow(self.scenario_observed, 2) + pow(self.scenario_explored, 2))
+
+        return [dist1, dist2, abs(dist1 - dist2)]
+
+
+def get_result(obs1, expl1, obs2, expl2, threshold):
+    # d(E_0, E_x) = \sqrt{(expl(E_0) - expl(E_x)) ^ 2 + (obs(E_0) - obs(E_x)) ^ 2}
+    dist1 = sqrt(pow(expl1, 2) + pow(obs1, 2))
+    dist2 = sqrt(pow(expl2, 2) + pow(obs2, 2))
+
+    # Comparing to ROOT
+    # return abs(dist1 - dist2) < (dist1 * 0.05)
+    # return abs(dist1 - dist2) < (dist1 * 0.10)
+    # return abs(dist1 - dist2) < (dist1 * 0.15)
+    # return abs(dist1 - dist2) < (dist1 * 0.20)
+    # return abs(dist1 - dist2) < (dist1 * 0.30)
+    # return abs(dist1 - dist2) < (dist1 * 0.40)
+    return abs(dist1 - dist2) < (dist1 * threshold)
+
+
+def get_exception_data(scenario_file):
+    exception_file = os.path.join(scenario_file, 'logs', 'exceptions.txt').replace('/scenarios/', '/exploration/')
+
+    if os.path.exists(exception_file):
+        exception_data = read_file(exception_file)
+        return exception_data[3].split(':')[-2].strip() + ': ' + exception_data[3].split(':')[-1].strip()
+
+    return ''
+
 
 logger = logging.getLogger()
 
@@ -33,73 +107,159 @@ sensitive_apis_mapping = mp.keys()
 fileConfig('logging_config.ini')
 result = []
 #d = 'data/app_did_not_crash/scenarios/'
-d = 'data/obs_expl/0.50/scenarios/'
-for f in os.listdir(d):
-    logger.info('Processing results in directory %s' % f)
-    fn = os.path.join(os.path.join(d, f))
-    for g in os.listdir(fn):
-        logger.info('Processing results in directory %s' % g)
-        expl_dir = os.path.join(os.path.join(fn, g))
+base_dir = 'data/obs_expl/'
 
-        if (not os.path.isdir(expl_dir)) or ('unchanged' in expl_dir):
-            continue
+for threshold in reversed(os.listdir(base_dir)):
+    threshold_dir = os.path.join(base_dir, threshold, 'scenarios')
+    for apis_blocked in os.listdir(threshold_dir):
+        # Debug
+        #if apis_blocked != '2-api-blocked':
+        #    continue
 
-        for h in os.listdir(expl_dir):
-            logger.info('Processing results in directory %s' % h)
-            scenario_file = os.path.join(os.path.join(expl_dir, h))
-            scenario_data = read_file(scenario_file)
+        logger.info('Processing results in directory %s' % apis_blocked)
+        apis_blocked_dir = os.path.join(os.path.join(threshold_dir, apis_blocked))
+        for application in os.listdir(apis_blocked_dir):
+            # Debug
+            #if g != 'com.ng.dailynews_v1_13':
+            #    continue
 
-            for i in mapping:
-                restriction = i[0]
-                aa = i[1]
-                api = aa.replace(',,', ',')
-                #api = 'java.net.Socket->connect(java.net.SocketAddress,int)'
+            logger.info('Processing results in directory %s' % application)
+            expl_dir = os.path.join(os.path.join(apis_blocked_dir, application))
 
-                fr_dir = 'data/exploration/first-run/%s' % g
-                fr_path = os.path.join(fr_dir, 'summarized_api_list.txt')
-                #fr_path = 'C:/Users/natan_000/Desktop/Saarland/repositories/automatic-permission-tightening/data/exploration/first-run/animaonline.android.wikiexplorer_v1_5_5/summarized_api_list.txt'
+            if (not os.path.isdir(expl_dir)) or ('unchanged' in expl_dir):
+                continue
 
-                if not os.path.exists(fr_path):
-                    logger.error('Missing initial exploration %s' % g)
-                    break
+            for scenario in os.listdir(expl_dir):
+                logger.info('Processing results in directory %s' % scenario)
+                scenario_file = os.path.join(os.path.join(expl_dir, scenario))
+                scenario_data = read_file(scenario_file)
 
-                fr_data = read_file(fr_path)
-                # Remove header
-                fr_data = fr_data[1:]
+                expl_res = ExplorationResult()
+                expl_res.app = application
+                expl_res.scenario = scenario
+                expl_res.size = int(apis_blocked[0])
+                expl_res.threshold = float(threshold)
+                expl_res.exception = get_exception_data(scenario_file)
+                expl_res.APIs = []
 
-                nr_api_calls = 0
-                nr_this_api_calls = 0
-                total_api_calls = 0
-                this_api_calls = 0
+                stats_file = os.path.join('data/exploration/first-run', application, 'aggregate_stats.txt')
+                if os.path.exists(stats_file):
+                    stats_data = read_file(stats_file)[1].split('\t')
+                    expl_res.initial_expl_observed = int(stats_data[5].strip())
+                    expl_res.initial_expl_explored = int(stats_data[6].strip())
 
-                for a in fr_data:
-                    s = a.split('\t')
-                    if len(s) == 2:
-                        # Count only sensitive APIs
-                        if s[0] in sensitive_apis_mapping:
-                            total_api_calls += int(s[1].strip())
-                            nr_api_calls += 1
+                if expl_res.size == 1:
+                    stats_file_scenario = os.path.join('data/exploration/1-api-blocked', application, scenario, 'aggregate_stats.txt')
+                else:
+                    stats_file_scenario = os.path.join(scenario_file.replace('\\scenarios\\', '/exploration/'), 'aggregate_stats.txt')
+                if os.path.exists(stats_file_scenario):
+                    stats_data_scenario = read_file(stats_file_scenario)
+                    if len(stats_data_scenario) > 1:
+                        stats_data_scenario = stats_data_scenario[1].split('\t')
+                        expl_res.scenario_observed = int(stats_data_scenario[5].strip())
+                        expl_res.scenario_explored = int(stats_data_scenario[6].strip())
 
-                        if s[0] == api:
-                            this_api_calls = int(s[1].strip())
-                            nr_this_api_calls = 1
+                expl_res.result005 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.05)
+                expl_res.result010 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.10)
+                expl_res.result015 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.15)
+                expl_res.result020 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.20)
+                expl_res.result030 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.30)
+                expl_res.result040 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.40)
+                expl_res.result050 = get_result(expl_res.initial_expl_observed, expl_res.initial_expl_explored,
+                                                expl_res.scenario_observed, expl_res.scenario_explored, 0.50)
 
-                for line in scenario_data:
-                    if ('true' in line) and (restriction in line):
-                        logger.info('Mapped %s -> %s' % (restriction, api))
+                for item in mapping:
+                    restriction = item[0]
+                    api = item[1].replace(',,', ',')
+                    #api = 'java.net.Socket->connect(java.net.SocketAddress,int)'
 
-                        done = False
-                        for idx, a in enumerate(result):
-                            if a[0] == scenario_file:
-                                result[idx][2] += this_api_calls
-                                result[idx][4] += nr_this_api_calls
-                                result[idx][5] += '\t%s' % api
-                                done = True
+                    api_list_path = os.path.join('data/exploration/first-run', application, 'summarized_api_list.txt')
+                    #first_run_path = 'C:/Users/natan_000/Desktop/Saarland/repositories/automatic-permission-tightening/data/exploration/first-run/animaonline.android.wikiexplorer_v1_5_5/summarized_api_list.txt'
 
-                        if not done:
-                            result.append([scenario_file, total_api_calls, this_api_calls, nr_api_calls, nr_this_api_calls, api])
-
+                    if not os.path.exists(api_list_path):
+                        logger.error('Missing initial exploration %s' % application)
                         break
 
+                    # Remove header
+                    api_list = read_file(api_list_path)[1:]
+
+                    # Reset counter, only last one is valid
+                    expl_res.API_calls_total = 0
+                    expl_res.uniq_API_calls_total = 0
+
+                    for api_list_item in api_list:
+                        line_data = api_list_item.split('\t')
+                        if len(line_data) == 2:
+                            tmp_api = line_data[0]
+                            tmp_qtd = int(line_data[1].strip())
+
+                            # Count only sensitive APIs
+                            if tmp_api in sensitive_apis_mapping:
+                                expl_res.API_calls_total += tmp_qtd
+                                expl_res.uniq_API_calls_total += 1
+
+                                if tmp_api == api:
+                                    # Count API blocked in scenario
+                                    for line in scenario_data:
+                                        if ('true' in line) and (restriction in line):
+                                            #logger.info('Mapped %s -> %s' % (restriction, api))
+
+                                            expl_res.API_calls_blocked += tmp_qtd
+                                            expl_res.uniq_API_calls_blocked += 1
+                                            expl_res.APIs.append(api)
+                                            break
+
+                found = filter(lambda x: (x.app == expl_res.app) and (x.qtd_APIs() == expl_res.qtd_APIs()) and len([api for api in x.APIs if api not in expl_res.APIs]) == 0, result)
+                if found == []:
+                    result.append(expl_res)
+                else:
+                    logger.debug('Scenario already included, ignoring.')
+                    pass
+
+# Sleep to prevent problems printing the data
+threading._sleep(1)
+
 for r in result:
-    print('%s\t%d\t%d\t%d\t%d\t%s' % (r[0], r[1], r[2], r[3], r[4], r[5]))
+    tmp = ''
+    for a in r.APIs:
+        tmp += '\t%s' % a
+
+    i = r.qtd_APIs()
+    while i <= 8:
+        tmp += '\t-'
+        i += 1
+
+    print('%.2f' % r.threshold + '\t' +
+          str(r.size) + '\t' +
+          str(r.app) + '\t' +
+          str(r.scenario) + '\t' +
+          str(r.initial_expl_observed) + '\t' +
+          str(r.initial_expl_explored) + '\t' +
+          str(r.scenario_observed) + '\t' +
+          str(r.scenario_explored) + '\t' +
+          '%.2f' % r.get_dists()[0] + '\t' +
+          '%.2f' % r.get_dists()[1] + '\t' +
+          '%.2f' % r.get_dists()[2] + '\t' +
+          '%.2f' % (r.get_dists()[2]/max(r.get_dists()[0], 1)) + '\t' +
+          '%d' % r.result005 + '\t' +
+          '%d' % r.result010 + '\t' +
+          '%d' % r.result015 + '\t' +
+          '%d' % r.result020 + '\t' +
+          '%d' % r.result030 + '\t' +
+          '%d' % r.result040 + '\t' +
+          '%d' % r.result050 + '\t' +
+          str(r.API_calls_total) + '\t' +
+          str(r.API_calls_blocked) + '\t' +
+          str(r.API_calls_perc()) + '\t' +
+          str(r.uniq_API_calls_total) + '\t' +
+          str(r.uniq_API_calls_blocked) + '\t' +
+          str(r.uniq_API_calls_perc()) + '\t' +
+          str(r.qtd_APIs()) + '\t' +
+          tmp.strip()
+          )
